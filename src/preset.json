@@ -1,0 +1,126 @@
+{
+  "name": "Starter",
+  "settings": {
+    "brand": {
+      "primary": "#2563EB",
+      "background": "#ffffff",
+      "text": "#374151",
+      "accent": "#F59E0B",
+      "font": "Inter"
+    },
+    "header": {
+      "logo": null,
+      "logoHeight": 36,
+      "sticky": true,
+      "showSearch": true,
+      "menuHandle": "main-menu"
+    },
+    "hero": {
+      "enabled": true,
+      "backgroundImage": null,
+      "heading": "Welcome to our store",
+      "subheading": "Discover amazing products at great prices.",
+      "buttonText": "Shop Now",
+      "buttonLink": "/collections/all",
+      "overlayOpacity": 50,
+      "overlayColor": "#000000",
+      "textColor": "#ffffff"
+    },
+    "products": {
+      "enabled": true,
+      "heading": "Featured Products",
+      "collection": "all",
+      "limit": 8,
+      "columns": "4"
+    },
+    "contact": {
+      "enabled": false,
+      "heading": "Get in Touch",
+      "showPhone": true,
+      "phone": "",
+      "showEmail": true,
+      "email": "",
+      "showWhatsApp": false,
+      "whatsapp": "",
+      "showAddress": false,
+      "address": ""
+    },
+    "footer": {
+      "description": "",
+      "menuHandle": "footer",
+      "copyright": "",
+      "instagram": "",
+      "facebook": "",
+      "twitter": "",
+      "tiktok": ""
+    },
+    "announcement": {
+      "enabled": false,
+      "text": "Free shipping on orders over $50!",
+      "backgroundColor": "#2563EB",
+      "textColor": "#ffffff"
+    }
+  },
+  "sections": {
+    "announcement_1": {
+      "type": "announcement",
+      "settings": {}
+    },
+    "header_1": {
+      "type": "header",
+      "settings": {}
+    },
+    "hero_1": {
+      "type": "hero",
+      "settings": {}
+    },
+    "featured_products_1": {
+      "type": "featured-products",
+      "settings": {}
+    },
+    "contact_info_1": {
+      "type": "contact-info",
+      "settings": {}
+    },
+    "footer_1": {
+      "type": "footer",
+      "settings": {}
+    },
+    "main-product": {
+      "type": "product-detail",
+      "settings": {}
+    },
+    "main-collection": {
+      "type": "product-list",
+      "settings": {}
+    },
+    "main-cart": {
+      "type": "cart-page",
+      "settings": {}
+    },
+    "main-checkout": {
+      "type": "checkout-page",
+      "settings": {}
+    }
+  },
+  "layout": {
+    "header": [
+      "announcement_1",
+      "header_1"
+    ],
+    "content": [
+      "hero_1",
+      "featured_products_1",
+      "contact_info_1"
+    ],
+    "footer": [
+      "footer_1"
+    ]
+  },
+  "templates": {
+    "product_detail": { "order": ["main-product"] },
+    "collection": { "order": ["main-collection"] },
+    "cart": { "order": ["main-cart"] },
+    "checkout": { "order": ["main-checkout"] }
+  }
+}
