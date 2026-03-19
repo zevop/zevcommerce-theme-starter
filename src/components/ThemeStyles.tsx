@@ -23,7 +23,12 @@ export default function ThemeStyles() {
         --color-background: ${background};
         --color-text: ${text};
         --color-accent: ${accent};
+        --color-border: #e5e7eb;
+        --color-secondary: #f3f4f6;
+        --color-danger: #ef4444;
+        --color-success: #22c55e;
         --font-body: '${fontBody}', sans-serif;
+        --font-heading: '${fontBody}', sans-serif;
       }
 
       body {
@@ -31,6 +36,32 @@ export default function ThemeStyles() {
         color: var(--color-text);
         font-family: var(--font-body);
         margin: 0;
+      }
+
+      *:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+          animation-duration: 0.01ms !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+
+      input, textarea, select {
+        border: 1px solid var(--color-border);
+        border-radius: 0.5rem;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        background: var(--color-background);
+        color: var(--color-text);
+      }
+      input:focus, textarea:focus, select:focus {
+        outline: none;
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
       }
 
       .container {

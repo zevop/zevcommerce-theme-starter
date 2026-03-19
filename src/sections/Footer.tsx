@@ -77,7 +77,7 @@ export default function Footer() {
   return (
     <footer
       className="py-12 md:py-16 border-t"
-      style={{ backgroundColor: 'var(--color-background)', borderColor: '#e5e7eb' }}
+      style={{ backgroundColor: 'var(--color-background)', borderColor: 'var(--color-border)' }}
     >
       <div className="container mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12">
@@ -121,7 +121,7 @@ export default function Footer() {
               <h3 className="text-sm font-semibold uppercase tracking-wider mb-4" style={{ color: 'var(--color-text)' }}>
                 Quick Links
               </h3>
-              <nav className="flex flex-col gap-2.5">
+              <nav aria-label="Footer navigation" className="flex flex-col gap-2.5">
                 {menuItems.map((item: any) => (
                   <Link
                     key={item.id}
@@ -149,7 +149,7 @@ export default function Footer() {
         </div>
 
         {/* Copyright */}
-        <div className="mt-12 pt-8 border-t text-center" style={{ borderColor: '#e5e7eb' }}>
+        <div className="mt-12 pt-8 border-t text-center" style={{ borderColor: 'var(--color-border)' }}>
           <p className="text-xs" style={{ color: 'var(--color-text)', opacity: 0.4 }}>
             &copy; {copyright}
           </p>

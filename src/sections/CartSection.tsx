@@ -20,7 +20,7 @@ export default function CartSection() {
         <div className="container mx-auto px-4 sm:px-6">
           <div
             className="w-16 h-16 mx-auto mb-6 rounded-full flex items-center justify-center"
-            style={{ backgroundColor: '#f3f4f6' }}
+            style={{ backgroundColor: 'var(--color-secondary)' }}
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ color: 'var(--color-text)', opacity: 0.4 }}>
               <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
@@ -56,7 +56,7 @@ export default function CartSection() {
         </h1>
 
         {/* Cart Items */}
-        <div className="divide-y" style={{ borderColor: '#e5e7eb' }}>
+        <div className="divide-y" style={{ borderColor: 'var(--color-border)' }}>
           {items.map((item) => (
             <div key={item.variantId} className="flex gap-4 py-6">
               {/* Image */}
@@ -96,7 +96,8 @@ export default function CartSection() {
                   <div className="inline-flex items-center border rounded text-sm" style={{ borderColor: '#d1d5db' }}>
                     <button
                       onClick={() => updateQuantity(item.variantId, -1)}
-                      className="px-2.5 py-1 hover:bg-gray-50 transition-colors"
+                      aria-label="Decrease quantity"
+                      className="px-2.5 py-1 transition-colors"
                       style={{ color: 'var(--color-text)' }}
                     >
                       -
@@ -106,7 +107,8 @@ export default function CartSection() {
                     </span>
                     <button
                       onClick={() => updateQuantity(item.variantId, 1)}
-                      className="px-2.5 py-1 hover:bg-gray-50 transition-colors"
+                      aria-label="Increase quantity"
+                      className="px-2.5 py-1 transition-colors"
                       style={{ color: 'var(--color-text)' }}
                     >
                       +
@@ -114,8 +116,9 @@ export default function CartSection() {
                   </div>
                   <button
                     onClick={() => removeItem(item.variantId)}
+                    aria-label={`Remove ${item.title}`}
                     className="text-xs font-medium transition-opacity hover:opacity-70"
-                    style={{ color: '#ef4444' }}
+                    style={{ color: 'var(--color-danger)' }}
                   >
                     Remove
                   </button>
@@ -126,7 +129,7 @@ export default function CartSection() {
         </div>
 
         {/* Summary */}
-        <div className="mt-8 pt-6 border-t" style={{ borderColor: '#e5e7eb' }}>
+        <div className="mt-8 pt-6 border-t" style={{ borderColor: 'var(--color-border)' }}>
           <div className="flex items-center justify-between mb-6">
             <span className="text-base font-semibold" style={{ color: 'var(--color-text)' }}>
               Total

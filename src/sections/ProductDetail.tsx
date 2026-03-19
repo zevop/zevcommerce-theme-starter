@@ -87,7 +87,7 @@ export default function ProductDetail() {
           <div>
             {/* Main Image */}
             {images.length > 0 && (
-              <div className="relative aspect-square mb-3 rounded-lg overflow-hidden" style={{ backgroundColor: '#f3f4f6' }}>
+              <div className="relative aspect-square mb-3 rounded-lg overflow-hidden" style={{ backgroundColor: 'var(--color-secondary)' }}>
                 <img
                   src={images[activeImageIndex]?.url}
                   alt={product.title}
@@ -96,7 +96,7 @@ export default function ProductDetail() {
                 {isOnSale && (
                   <span
                     className="absolute top-3 left-3 text-xs font-semibold px-2.5 py-1 rounded"
-                    style={{ backgroundColor: '#ef4444', color: '#fff' }}
+                    style={{ backgroundColor: 'var(--color-danger)', color: '#fff' }}
                   >
                     Sale
                   </span>
@@ -111,6 +111,7 @@ export default function ProductDetail() {
                   <button
                     key={i}
                     onClick={() => setActiveImageIndex(i)}
+                    aria-label={`View image ${i + 1}`}
                     className="flex-shrink-0 w-16 h-16 rounded overflow-hidden border-2 transition-colors"
                     style={{
                       borderColor: i === activeImageIndex ? 'var(--color-primary)' : 'transparent',
@@ -196,7 +197,8 @@ export default function ProductDetail() {
               <div className="inline-flex items-center border rounded" style={{ borderColor: '#d1d5db' }}>
                 <button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="px-3 py-2 text-sm hover:bg-gray-50 transition-colors"
+                  aria-label="Decrease quantity"
+                  className="px-3 py-2 text-sm transition-colors"
                   style={{ color: 'var(--color-text)' }}
                 >
                   -
@@ -206,7 +208,8 @@ export default function ProductDetail() {
                 </span>
                 <button
                   onClick={() => setQuantity(quantity + 1)}
-                  className="px-3 py-2 text-sm hover:bg-gray-50 transition-colors"
+                  aria-label="Increase quantity"
+                  className="px-3 py-2 text-sm transition-colors"
                   style={{ color: 'var(--color-text)' }}
                 >
                   +
@@ -225,7 +228,7 @@ export default function ProductDetail() {
 
             {/* Description */}
             {product.description && (
-              <div className="mt-8 pt-8 border-t" style={{ borderColor: '#e5e7eb' }}>
+              <div className="mt-8 pt-8 border-t" style={{ borderColor: 'var(--color-border)' }}>
                 <h3 className="text-sm font-semibold mb-3" style={{ color: 'var(--color-text)' }}>
                   Description
                 </h3>

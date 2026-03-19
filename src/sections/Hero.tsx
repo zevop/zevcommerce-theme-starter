@@ -36,7 +36,7 @@ export default function Hero() {
         backgroundImage: bgImage ? `url("${bgImage}")` : undefined,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        backgroundColor: !bgImage ? '#1f2937' : undefined,
+        backgroundColor: !bgImage ? 'var(--color-text)' : undefined,
       }}
     >
       {/* Overlay */}

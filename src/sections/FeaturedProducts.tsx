@@ -57,10 +57,10 @@ export default function FeaturedProducts() {
       <section className="py-12 md:py-16" style={{ backgroundColor: 'var(--color-background)' }}>
         <div className="container mx-auto px-4 sm:px-6">
           <div className="animate-pulse">
-            <div className="h-8 w-48 mb-8 rounded" style={{ backgroundColor: '#e5e7eb' }} />
+            <div className="h-8 w-48 mb-8 rounded" style={{ backgroundColor: 'var(--color-border)' }} />
             <div className={`grid grid-cols-2 ${gridColsClass} gap-4 sm:gap-6`}>
               {[...Array(columns)].map((_, i) => (
-                <div key={i} className="aspect-[3/4] rounded-lg" style={{ backgroundColor: '#e5e7eb' }} />
+                <div key={i} className="aspect-[3/4] rounded-lg" style={{ backgroundColor: 'var(--color-border)' }} />
               ))}
             </div>
           </div>

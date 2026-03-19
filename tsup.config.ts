@@ -5,5 +5,5 @@ export default defineConfig({
   dts: true,
   sourcemap: true,
   clean: true,
-  external: ['react', 'react-dom', 'next', '@zevcommerce/theme-sdk'],
+  external: ['react', 'react-dom', 'next', '@zevcommerce/theme-sdk', '@zevcommerce/storefront-api'],
 });

@@ -13,10 +13,10 @@ export default function ProductList() {
     return (
       <div className="py-24 text-center" style={{ backgroundColor: 'var(--color-background)' }}>
         <div className="animate-pulse flex flex-col items-center">
-          <div className="h-8 w-48 rounded mb-4" style={{ backgroundColor: '#e5e7eb' }} />
+          <div className="h-8 w-48 rounded mb-4" style={{ backgroundColor: 'var(--color-border)' }} />
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 w-full max-w-6xl mx-auto px-4">
             {[1, 2, 3, 4].map(i => (
-              <div key={i} className="aspect-[3/4] rounded-lg" style={{ backgroundColor: '#e5e7eb' }} />
+              <div key={i} className="aspect-[3/4] rounded-lg" style={{ backgroundColor: 'var(--color-border)' }} />
             ))}
           </div>
         </div>

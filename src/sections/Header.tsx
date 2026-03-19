@@ -90,7 +90,7 @@ export default function Header() {
       <header
         style={{
           backgroundColor: 'var(--color-background)',
-          borderBottom: '1px solid #e5e7eb',
+          borderBottom: '1px solid var(--color-border)',
           position: sticky ? 'sticky' : 'relative',
           top: 0,
           zIndex: 50,
@@ -195,7 +195,7 @@ export default function Header() {
           onClick={(e) => { if (e.target === e.currentTarget) { setSearchOpen(false); setSuggestions([]); } }}
         >
           <div className="w-full max-w-lg mx-4 rounded-lg overflow-hidden" style={{ backgroundColor: 'var(--color-background)' }}>
-            <form onSubmit={handleSearch} className="flex items-center px-4 py-3 border-b" style={{ borderColor: '#e5e7eb' }}>
+            <form onSubmit={handleSearch} className="flex items-center px-4 py-3 border-b" style={{ borderColor: 'var(--color-border)' }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="mr-3 flex-shrink-0" style={{ color: 'var(--color-text)', opacity: 0.4 }}>
                 <circle cx="11" cy="11" r="8" />
                 <line x1="21" y1="21" x2="16.65" y2="16.65" />
@@ -212,6 +212,7 @@ export default function Header() {
               <button
                 type="button"
                 onClick={() => { setSearchOpen(false); setSuggestions([]); setSearchQuery(''); }}
+                aria-label="Close search"
                 className="p-1 ml-2"
                 style={{ color: 'var(--color-text)', opacity: 0.4 }}
               >
@@ -228,7 +229,10 @@ export default function Header() {
                     key={product.id}
                     href={getStorePermalink(domain, `/products/${product.slug}`)}
                     onClick={() => { setSearchOpen(false); setSuggestions([]); setSearchQuery(''); }}
-                    className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-gray-50"
+                    className="flex items-center gap-3 px-4 py-3 transition-colors"
+                    style={{ backgroundColor: 'transparent' }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'var(--color-secondary)'; }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent'; }}
                   >
                     {product.media?.[0]?.url && (
                       <img src={product.media[0].url} alt={product.title} className="w-10 h-10 object-cover rounded" />
@@ -257,7 +261,7 @@ export default function Header() {
             style={{ backgroundColor: 'var(--color-background)' }}
           >
             {/* Mobile header */}
-            <div className="flex items-center justify-between px-4 py-4 border-b" style={{ borderColor: '#e5e7eb' }}>
+            <div className="flex items-center justify-between px-4 py-4 border-b" style={{ borderColor: 'var(--color-border)' }}>
               <Link href={getStorePermalink(domain, '/')} onClick={() => setMobileOpen(false)}>
                 {logoSrc ? (
                   <img src={logoSrc} alt={storeName} style={{ height: '28px', width: 'auto' }} />
@@ -286,7 +290,7 @@ export default function Header() {
                   href={resolveMenuUrl(item, domain)}
                   onClick={() => setMobileOpen(false)}
                   className="block py-3 text-sm font-medium border-b transition-opacity hover:opacity-70"
-                  style={{ color: 'var(--color-text)', borderColor: '#f3f4f6' }}
+                  style={{ color: 'var(--color-text)', borderColor: 'var(--color-secondary)' }}
                 >
                   {item.title}
                 </Link>
