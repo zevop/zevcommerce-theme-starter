@@ -5,7 +5,7 @@ import { CheckoutForm } from '@zevcommerce/storefront-api';
 export default function CheckoutSection() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--color-background)' }}>
-      <div className="container mx-auto px-4 sm:px-6 py-8 md:py-16 max-w-4xl">
+      <div className="container mx-auto px-5 sm:px-6 py-8 md:py-16 max-w-4xl">
         <CheckoutForm />
       </div>
     </div>

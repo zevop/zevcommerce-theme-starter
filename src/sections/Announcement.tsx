@@ -17,7 +17,7 @@ export default function Announcement() {
       className="py-2.5 text-center"
       style={{ backgroundColor, color: textColor, fontFamily: 'var(--font-body)' }}
     >
-      <p className="text-xs sm:text-sm font-medium px-4">{text}</p>
+      <p className="text-sm sm:text-base font-medium px-5">{text}</p>
     </div>
   );
 }

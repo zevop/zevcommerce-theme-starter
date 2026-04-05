@@ -12,6 +12,8 @@ export const settingsSchema = defineSettings([
       { type: 'color', id: 'brand.background', label: 'Background Color', default: '#ffffff' },
       { type: 'color', id: 'brand.text', label: 'Text Color', default: '#374151' },
       { type: 'color', id: 'brand.accent', label: 'Accent Color', default: '#F59E0B' },
+      { type: 'color', id: 'brand.border', label: 'Border Color', default: '#e5e7eb' },
+      { type: 'color', id: 'brand.secondary', label: 'Secondary Background', default: '#f3f4f6' },
       {
         type: 'select',
         id: 'brand.font',
@@ -59,6 +61,8 @@ export const settingsSchema = defineSettings([
       { type: 'range', id: 'hero.overlayOpacity', label: 'Overlay Opacity', min: 0, max: 100, step: 5, default: 50 },
       { type: 'color', id: 'hero.overlayColor', label: 'Overlay Color', default: '#000000' },
       { type: 'color', id: 'hero.textColor', label: 'Text Color', default: '#ffffff' },
+      { type: 'color', id: 'hero.fallbackGradientStart', label: 'Fallback Gradient Start', show_if: 'hero.enabled' },
+      { type: 'color', id: 'hero.fallbackGradientEnd', label: 'Fallback Gradient End', show_if: 'hero.enabled' },
     ],
   },
 
@@ -70,6 +74,7 @@ export const settingsSchema = defineSettings([
     icon: 'shopping-bag',
     settings: [
       { type: 'checkbox', id: 'products.enabled', label: 'Show Featured Products', default: true },
+      { type: 'checkbox', id: 'products.showPlaceholders', label: 'Show Placeholders When Empty', default: true },
       { type: 'text', id: 'products.heading', label: 'Section Heading', default: 'Featured Products' },
       { type: 'collection_picker', id: 'products.collection', label: 'Collection', default: 'all' },
       { type: 'range', id: 'products.limit', label: 'Number of Products', min: 4, max: 24, step: 4, default: 8 },

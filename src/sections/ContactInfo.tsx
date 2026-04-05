@@ -75,7 +75,7 @@ export default function ContactInfo() {
 
   return (
     <section className="py-12 md:py-16" style={{ backgroundColor: 'var(--color-background)' }}>
-      <div className="container mx-auto px-4 sm:px-6">
+      <div className="container mx-auto px-5 sm:px-6">
         <h2
           className="text-2xl md:text-3xl font-bold text-center mb-10"
           style={{ color: 'var(--color-text)' }}
@@ -88,7 +88,7 @@ export default function ContactInfo() {
             const content = (
               <div
                 key={i}
-                className="flex flex-col items-center text-center p-6 rounded-lg border transition-shadow hover:shadow-md"
+                className="flex flex-col items-center text-center p-6 rounded-lg border transition-shadow hover:shadow-md min-h-[48px]"
                 style={{ borderColor: 'var(--color-border)' }}
               >
                 <div
@@ -100,7 +100,7 @@ export default function ContactInfo() {
                 <h3 className="text-xs font-semibold uppercase tracking-wider mb-1" style={{ color: 'var(--color-text)', opacity: 0.5 }}>
                   {card.label}
                 </h3>
-                <p className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>
+                <p className="text-base font-medium" style={{ color: 'var(--color-text)' }}>
                   {card.value}
                 </p>
               </div>
@@ -108,7 +108,7 @@ export default function ContactInfo() {
 
             if (card.href) {
               return (
-                <a key={i} href={card.href} target={card.label === 'WhatsApp' ? '_blank' : undefined} rel="noopener noreferrer">
+                <a key={i} href={card.href} target={card.label === 'WhatsApp' ? '_blank' : undefined} rel="noopener noreferrer" className="min-h-[48px]">
                   {content}
                 </a>
               );

@@ -6,6 +6,8 @@
       "background": "#ffffff",
       "text": "#374151",
       "accent": "#F59E0B",
+      "border": "#e5e7eb",
+      "secondary": "#f3f4f6",
       "font": "Inter"
     },
     "header": {
@@ -24,10 +26,13 @@
       "buttonLink": "/collections/all",
       "overlayOpacity": 50,
       "overlayColor": "#000000",
-      "textColor": "#ffffff"
+      "textColor": "#ffffff",
+      "fallbackGradientStart": null,
+      "fallbackGradientEnd": null
     },
     "products": {
       "enabled": true,
+      "showPlaceholders": true,
       "heading": "Featured Products",
       "collection": "all",
       "limit": 8,

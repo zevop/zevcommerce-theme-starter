@@ -5,6 +5,44 @@ import Link from 'next/link';
 import { useTheme, getCollection, ProductCard, getStorePermalink } from '@zevcommerce/storefront-api';
 import { useParams } from 'next/navigation';
 
+function PlaceholderCard() {
+  return (
+    <div className="flex flex-col">
+      <div
+        className="aspect-[3/4] rounded-xl flex items-center justify-center"
+        style={{ backgroundColor: 'var(--color-secondary)' }}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="32"
+          height="32"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          style={{ color: 'var(--color-border)', opacity: 0.5 }}
+        >
+          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <path d="M16 10a4 4 0 0 1-8 0" />
+        </svg>
+      </div>
+      <div className="mt-3 space-y-2.5 px-0.5">
+        <div
+          className="h-3 w-2/3 rounded"
+          style={{ backgroundColor: 'var(--color-border)', opacity: 0.4 }}
+        />
+        <div
+          className="h-3 w-1/4 rounded"
+          style={{ backgroundColor: 'var(--color-border)', opacity: 0.3 }}
+        />
+      </div>
+    </div>
+  );
+}
+
 export default function FeaturedProducts() {
   const { theme, storeConfig } = useTheme();
   const params = useParams();
@@ -55,7 +93,7 @@ export default function FeaturedProducts() {
   if (loading) {
     return (
       <section className="py-12 md:py-16" style={{ backgroundColor: 'var(--color-background)' }}>
-        <div className="container mx-auto px-4 sm:px-6">
+        <div className="container mx-auto px-5 sm:px-6">
           <div className="animate-pulse">
             <div className="h-8 w-48 mb-8 rounded" style={{ backgroundColor: 'var(--color-border)' }} />
             <div className={`grid grid-cols-2 ${gridColsClass} gap-4 sm:gap-6`}>
@@ -69,22 +107,26 @@ export default function FeaturedProducts() {
     );
   }
 
-  if (products.length === 0) return null;
+  // Show placeholder cards when no products and placeholders are not disabled
+  const showPlaceholders = products.length === 0 && products_settings.showPlaceholders !== false;
+  const placeholderCount = Math.min(limit, 8);
+
+  if (products.length === 0 && !showPlaceholders) return null;
 
   return (
     <section className="py-12 md:py-16" style={{ backgroundColor: 'var(--color-background)' }}>
-      <div className="container mx-auto px-4 sm:px-6">
+      <div className="container mx-auto px-5 sm:px-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <h2
-            className="text-2xl md:text-3xl font-bold"
+            className="text-lg md:text-2xl font-bold"
             style={{ color: 'var(--color-text)' }}
           >
             {heading}
           </h2>
           <Link
             href={getStorePermalink(domain, `/collections/${collectionHandle}`)}
-            className="text-sm font-medium transition-opacity hover:opacity-70"
+            className="text-base font-medium transition-opacity hover:opacity-70"
             style={{ color: 'var(--color-primary)' }}
           >
             View All
@@ -93,13 +135,18 @@ export default function FeaturedProducts() {
 
         {/* Grid */}
         <div className={`grid grid-cols-2 ${gridColsClass} gap-4 sm:gap-6`}>
-          {products.map(product => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              domain={domain}
-            />
-          ))}
+          {products.length > 0
+            ? products.map(product => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  domain={domain}
+                />
+              ))
+            : [...Array(placeholderCount)].map((_, i) => (
+                <PlaceholderCard key={i} />
+              ))
+          }
         </div>
       </div>
     </section>

@@ -14,6 +14,8 @@ export default function ThemeStyles() {
   const background = brand?.background || '#ffffff';
   const text       = brand?.text       || '#374151';
   const accent     = brand?.accent     || '#F59E0B';
+  const border     = brand?.border     || '#e5e7eb';
+  const secondary  = brand?.secondary  || '#f3f4f6';
   const fontBody   = brand?.font       || 'Inter';
 
   return (
@@ -23,8 +25,8 @@ export default function ThemeStyles() {
         --color-background: ${background};
         --color-text: ${text};
         --color-accent: ${accent};
-        --color-border: #e5e7eb;
-        --color-secondary: #f3f4f6;
+        --color-border: ${border};
+        --color-secondary: ${secondary};
         --color-danger: #ef4444;
         --color-success: #22c55e;
         --font-body: '${fontBody}', sans-serif;
@@ -55,6 +57,7 @@ export default function ThemeStyles() {
         border-radius: 0.5rem;
         padding: 0.75rem 1rem;
         font-size: 1rem;
+        min-height: 3rem;
         background: var(--color-background);
         color: var(--color-text);
       }
@@ -69,8 +72,8 @@ export default function ThemeStyles() {
         max-width: 1280px;
         margin-left: auto;
         margin-right: auto;
-        padding-left: 1rem;
-        padding-right: 1rem;
+        padding-left: 1.25rem;
+        padding-right: 1.25rem;
       }
 
       @media (min-width: 640px) {
@@ -84,13 +87,14 @@ export default function ThemeStyles() {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        padding: 0.75rem 1.5rem;
-        font-size: 0.875rem;
+        padding: 0.875rem 1.5rem;
+        font-size: 1rem;
         font-weight: 600;
+        min-height: 3.5rem;
         color: #ffffff;
         background-color: var(--color-primary);
         border: none;
-        border-radius: 6px;
+        border-radius: 0.75rem;
         cursor: pointer;
         transition: opacity 0.2s ease;
         text-decoration: none;
@@ -104,19 +108,19 @@ export default function ThemeStyles() {
         align-items: center;
         justify-content: center;
         padding: 0.75rem 1.5rem;
-        font-size: 0.875rem;
+        font-size: 1rem;
         font-weight: 600;
+        min-height: 3rem;
         color: var(--color-text);
         background-color: transparent;
-        border: 1px solid var(--color-text);
-        border-radius: 6px;
+        border: 1px solid var(--color-border);
+        border-radius: 0.75rem;
         cursor: pointer;
         transition: background-color 0.2s ease, color 0.2s ease;
         text-decoration: none;
       }
       .btn-secondary:hover {
-        background-color: var(--color-text);
-        color: var(--color-background);
+        background-color: var(--color-secondary);
       }
     `}</style>
   );

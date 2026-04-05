@@ -20,6 +20,9 @@ export default function Hero() {
   const overlayColor = hero.overlayColor || '#000000';
   const textColor = hero.textColor || '#ffffff';
 
+  const fallbackGradientStart = hero.fallbackGradientStart || 'var(--color-primary)';
+  const fallbackGradientEnd = hero.fallbackGradientEnd || 'var(--color-accent)';
+
   const resolveImage = (img: any) => {
     if (!img) return undefined;
     if (typeof img === 'string') return img;
@@ -29,24 +32,31 @@ export default function Hero() {
 
   const bgImage = resolveImage(hero.backgroundImage);
 
+  const backgroundStyle: React.CSSProperties = bgImage
+    ? {
+        backgroundImage: `url("${bgImage}")`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }
+    : {
+        background: `linear-gradient(160deg, ${fallbackGradientStart} 0%, ${fallbackGradientEnd} 100%)`,
+      };
+
   return (
     <section
       className="relative flex items-center justify-center min-h-[60vh] md:min-h-[75vh]"
-      style={{
-        backgroundImage: bgImage ? `url("${bgImage}")` : undefined,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundColor: !bgImage ? 'var(--color-text)' : undefined,
-      }}
+      style={backgroundStyle}
     >
-      {/* Overlay */}
-      <div
-        className="absolute inset-0"
-        style={{ backgroundColor: overlayColor, opacity: overlayOpacity }}
-      />
+      {/* Overlay — only render when there is a background image */}
+      {bgImage && (
+        <div
+          className="absolute inset-0"
+          style={{ backgroundColor: overlayColor, opacity: overlayOpacity }}
+        />
+      )}
 
       {/* Content */}
-      <div className="relative z-10 container mx-auto px-4 sm:px-6 py-16 text-center">
+      <div className="relative z-10 container mx-auto px-5 sm:px-6 py-16 text-center">
         <h1
           className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight"
           style={{ color: textColor }}
@@ -64,8 +74,8 @@ export default function Hero() {
         {buttonText && (
           <Link
             href={getStorePermalink(domain, buttonLink)}
-            className="btn-primary inline-flex items-center px-6 py-3 sm:px-8 sm:py-3.5 text-sm sm:text-base font-semibold rounded-lg transition-opacity hover:opacity-90"
-            style={{ backgroundColor: 'var(--color-primary)', color: '#ffffff' }}
+            className="btn-primary inline-flex items-center px-6 py-4 sm:px-8 sm:py-4 min-h-[3.5rem] text-sm sm:text-base font-semibold rounded-lg transition-opacity hover:opacity-90"
+            style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-primary-foreground, #ffffff)' }}
           >
             {buttonText}
           </Link>

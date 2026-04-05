@@ -26,7 +26,7 @@ export default function ProductDetail() {
   if (!product) {
     return (
       <div className="py-24 text-center" style={{ backgroundColor: 'var(--color-background)' }}>
-        <p className="text-sm" style={{ color: 'var(--color-text)', opacity: 0.5 }}>
+        <p className="text-base" style={{ color: 'var(--color-text)', opacity: 0.5 }}>
           Product not found
         </p>
       </div>
@@ -72,7 +72,7 @@ export default function ProductDetail() {
 
   return (
     <section className="py-8 md:py-16" style={{ backgroundColor: 'var(--color-background)' }}>
-      <div className="container mx-auto px-4 sm:px-6 max-w-6xl">
+      <div className="container mx-auto px-5 sm:px-6 max-w-6xl pb-24 lg:pb-0">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-xs mb-8" style={{ color: 'var(--color-text)', opacity: 0.5 }}>
           <Link href={getStorePermalink(domain, '/')} className="hover:opacity-70 transition-opacity">Home</Link>
@@ -96,7 +96,7 @@ export default function ProductDetail() {
                 {isOnSale && (
                   <span
                     className="absolute top-3 left-3 text-xs font-semibold px-2.5 py-1 rounded"
-                    style={{ backgroundColor: 'var(--color-danger)', color: '#fff' }}
+                    style={{ backgroundColor: 'var(--color-danger)', color: 'var(--color-background)' }}
                   >
                     Sale
                   </span>
@@ -173,11 +173,11 @@ export default function ProductDetail() {
                             );
                             if (match) setSelectedVariant(match);
                           }}
-                          className="px-4 py-2 text-sm border rounded transition-colors"
+                          className="px-5 py-2 text-sm border rounded transition-colors min-h-[3rem]"
                           style={{
                             backgroundColor: isSelected ? 'var(--color-primary)' : 'transparent',
-                            color: isSelected ? '#fff' : 'var(--color-text)',
-                            borderColor: isSelected ? 'var(--color-primary)' : '#d1d5db',
+                            color: isSelected ? 'var(--color-background)' : 'var(--color-text)',
+                            borderColor: isSelected ? 'var(--color-primary)' : 'var(--color-border)',
                           }}
                         >
                           {val}
@@ -194,22 +194,22 @@ export default function ProductDetail() {
               <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text)' }}>
                 Quantity
               </label>
-              <div className="inline-flex items-center border rounded" style={{ borderColor: '#d1d5db' }}>
+              <div className="inline-flex items-center border rounded" style={{ borderColor: 'var(--color-border)' }}>
                 <button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
                   aria-label="Decrease quantity"
-                  className="px-3 py-2 text-sm transition-colors"
+                  className="min-w-[48px] min-h-[48px] text-sm transition-colors flex items-center justify-center"
                   style={{ color: 'var(--color-text)' }}
                 >
                   -
                 </button>
-                <span className="px-4 py-2 text-sm font-medium" style={{ color: 'var(--color-text)' }}>
+                <span className="px-5 py-2 text-sm font-medium" style={{ color: 'var(--color-text)' }}>
                   {quantity}
                 </span>
                 <button
                   onClick={() => setQuantity(quantity + 1)}
                   aria-label="Increase quantity"
-                  className="px-3 py-2 text-sm transition-colors"
+                  className="min-w-[48px] min-h-[48px] text-sm transition-colors flex items-center justify-center"
                   style={{ color: 'var(--color-text)' }}
                 >
                   +
@@ -217,11 +217,11 @@ export default function ProductDetail() {
               </div>
             </div>
 
-            {/* Add to Cart */}
+            {/* Add to Cart (desktop only) */}
             <button
               onClick={handleAddToCart}
-              className="w-full py-3.5 text-sm font-semibold rounded-lg transition-opacity hover:opacity-90"
-              style={{ backgroundColor: 'var(--color-primary)', color: '#fff' }}
+              className="hidden lg:flex w-full py-3.5 text-sm font-semibold rounded-lg transition-opacity hover:opacity-90 items-center justify-center"
+              style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-background)' }}
             >
               {addedToCart ? 'Added!' : 'Add to Cart'}
             </button>
@@ -233,12 +233,43 @@ export default function ProductDetail() {
                   Description
                 </h3>
                 <div
-                  className="text-sm leading-relaxed prose prose-sm max-w-none"
+                  className="text-base leading-relaxed prose prose-sm max-w-none"
                   style={{ color: 'var(--color-text)', opacity: 0.7 }}
                   dangerouslySetInnerHTML={{ __html: product.description }}
                 />
               </div>
             )}
+          </div>
+        </div>
+      </div>
+
+      {/* Sticky Add to Cart Bar (mobile only) */}
+      <div className="lg:hidden">
+        <div
+          className="fixed bottom-0 left-0 right-0 z-40 px-5 pt-3 pb-[env(safe-area-inset-bottom)]"
+          style={{
+            backgroundColor: 'var(--color-background)',
+            borderTop: '1px solid var(--color-border)',
+          }}
+        >
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex flex-col">
+              <span className="text-lg font-bold" style={{ color: 'var(--color-text)' }}>
+                {formatPrice(price, currency)}
+              </span>
+              {isOnSale && (
+                <span className="text-xs line-through" style={{ color: 'var(--color-text)', opacity: 0.4 }}>
+                  {formatPrice(compareAtPrice, currency)}
+                </span>
+              )}
+            </div>
+            <button
+              onClick={handleAddToCart}
+              className="h-14 flex-1 max-w-[240px] text-sm font-semibold rounded-lg transition-opacity hover:opacity-90 flex items-center justify-center"
+              style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-background)' }}
+            >
+              {addedToCart ? 'Added!' : 'Add to Cart'}
+            </button>
           </div>
         </div>
       </div>

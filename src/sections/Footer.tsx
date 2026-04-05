@@ -79,7 +79,7 @@ export default function Footer() {
       className="py-12 md:py-16 border-t"
       style={{ backgroundColor: 'var(--color-background)', borderColor: 'var(--color-border)' }}
     >
-      <div className="container mx-auto px-4 sm:px-6">
+      <div className="container mx-auto px-5 sm:px-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12">
           {/* Brand column */}
           <div>
@@ -91,13 +91,13 @@ export default function Footer() {
               )}
             </Link>
             {description && (
-              <p className="text-sm leading-relaxed max-w-xs" style={{ color: 'var(--color-text)', opacity: 0.6 }}>
+              <p className="text-base leading-relaxed max-w-xs" style={{ color: 'var(--color-text)', opacity: 0.6 }}>
                 {description}
               </p>
             )}
             {/* Social icons */}
             {socialLinks.length > 0 && (
-              <div className="flex items-center gap-4 mt-5">
+              <div className="flex items-center gap-2 mt-5">
                 {socialLinks.map((link, i) => (
                   <a
                     key={i}
@@ -105,7 +105,7 @@ export default function Footer() {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={link.platform}
-                    className="transition-opacity hover:opacity-70"
+                    className="min-w-[48px] min-h-[48px] flex items-center justify-center transition-opacity hover:opacity-70"
                     style={{ color: 'var(--color-text)', opacity: 0.5 }}
                   >
                     {link.icon}
@@ -121,12 +121,12 @@ export default function Footer() {
               <h3 className="text-sm font-semibold uppercase tracking-wider mb-4" style={{ color: 'var(--color-text)' }}>
                 Quick Links
               </h3>
-              <nav aria-label="Footer navigation" className="flex flex-col gap-2.5">
+              <nav aria-label="Footer navigation" className="flex flex-col">
                 {menuItems.map((item: any) => (
                   <Link
                     key={item.id}
                     href={resolveMenuUrl(item, domain)}
-                    className="text-sm transition-opacity hover:opacity-70"
+                    className="text-base min-h-[44px] flex items-center transition-opacity hover:opacity-70"
                     style={{ color: 'var(--color-text)', opacity: 0.6 }}
                   >
                     {item.title}
@@ -141,7 +141,7 @@ export default function Footer() {
             <h3 className="text-sm font-semibold uppercase tracking-wider mb-4" style={{ color: 'var(--color-text)' }}>
               Store
             </h3>
-            <div className="flex flex-col gap-2.5 text-sm" style={{ color: 'var(--color-text)', opacity: 0.6 }}>
+            <div className="flex flex-col gap-2.5 text-base" style={{ color: 'var(--color-text)', opacity: 0.6 }}>
               {storeConfig?.email && <p>{storeConfig.email}</p>}
               {storeConfig?.phone && <p>{storeConfig.phone}</p>}
             </div>

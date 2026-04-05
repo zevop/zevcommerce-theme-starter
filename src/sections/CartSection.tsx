@@ -17,7 +17,7 @@ export default function CartSection() {
   if (items.length === 0) {
     return (
       <div className="py-24 text-center" style={{ backgroundColor: 'var(--color-background)' }}>
-        <div className="container mx-auto px-4 sm:px-6">
+        <div className="container mx-auto px-5 sm:px-6">
           <div
             className="w-16 h-16 mx-auto mb-6 rounded-full flex items-center justify-center"
             style={{ backgroundColor: 'var(--color-secondary)' }}
@@ -47,7 +47,7 @@ export default function CartSection() {
 
   return (
     <section className="py-8 md:py-16" style={{ backgroundColor: 'var(--color-background)' }}>
-      <div className="container mx-auto px-4 sm:px-6 max-w-4xl">
+      <div className="container mx-auto px-5 sm:px-6 max-w-4xl pb-32 lg:pb-0">
         <h1 className="text-2xl md:text-3xl font-bold mb-8" style={{ color: 'var(--color-text)' }}>
           Your Cart
           <span className="text-base font-normal ml-2" style={{ opacity: 0.5 }}>
@@ -77,7 +77,7 @@ export default function CartSection() {
               <div className="flex-1 min-w-0">
                 <Link
                   href={getStorePermalink(domain, `/products/${item.slug}`)}
-                  className="text-sm font-medium hover:opacity-70 transition-opacity"
+                  className="text-base font-medium hover:opacity-70 transition-opacity"
                   style={{ color: 'var(--color-text)' }}
                 >
                   {item.title}
@@ -87,28 +87,28 @@ export default function CartSection() {
                     {item.variantTitle}
                   </p>
                 )}
-                <p className="text-sm font-semibold mt-2" style={{ color: 'var(--color-text)' }}>
+                <p className="text-base font-semibold mt-2" style={{ color: 'var(--color-text)' }}>
                   {formatPrice(parseFloat(item.price) * item.quantity, currency)}
                 </p>
 
                 {/* Quantity controls */}
                 <div className="flex items-center gap-3 mt-3">
-                  <div className="inline-flex items-center border rounded text-sm" style={{ borderColor: '#d1d5db' }}>
+                  <div className="inline-flex items-center border rounded text-sm" style={{ borderColor: 'var(--color-border)' }}>
                     <button
                       onClick={() => updateQuantity(item.variantId, -1)}
                       aria-label="Decrease quantity"
-                      className="px-2.5 py-1 transition-colors"
+                      className="min-w-[48px] min-h-[48px] transition-colors flex items-center justify-center"
                       style={{ color: 'var(--color-text)' }}
                     >
                       -
                     </button>
-                    <span className="px-3 py-1" style={{ color: 'var(--color-text)' }}>
+                    <span className="px-5 py-1" style={{ color: 'var(--color-text)' }}>
                       {item.quantity}
                     </span>
                     <button
                       onClick={() => updateQuantity(item.variantId, 1)}
                       aria-label="Increase quantity"
-                      className="px-2.5 py-1 transition-colors"
+                      className="min-w-[48px] min-h-[48px] transition-colors flex items-center justify-center"
                       style={{ color: 'var(--color-text)' }}
                     >
                       +
@@ -117,7 +117,7 @@ export default function CartSection() {
                   <button
                     onClick={() => removeItem(item.variantId)}
                     aria-label={`Remove ${item.title}`}
-                    className="text-xs font-medium transition-opacity hover:opacity-70"
+                    className="text-xs font-medium transition-opacity hover:opacity-70 min-h-[44px] inline-flex items-center"
                     style={{ color: 'var(--color-danger)' }}
                   >
                     Remove
@@ -128,8 +128,8 @@ export default function CartSection() {
           ))}
         </div>
 
-        {/* Summary */}
-        <div className="mt-8 pt-6 border-t" style={{ borderColor: 'var(--color-border)' }}>
+        {/* Summary (desktop only) */}
+        <div className="hidden lg:block mt-8 pt-6 border-t" style={{ borderColor: 'var(--color-border)' }}>
           <div className="flex items-center justify-between mb-6">
             <span className="text-base font-semibold" style={{ color: 'var(--color-text)' }}>
               Total
@@ -144,6 +144,35 @@ export default function CartSection() {
           >
             Proceed to Checkout
           </Link>
+        </div>
+      </div>
+
+      {/* Sticky Checkout Bar (mobile only) */}
+      <div className="lg:hidden">
+        <div
+          className="fixed bottom-0 left-0 right-0 z-40 px-5 pt-3 pb-[env(safe-area-inset-bottom)] backdrop-blur"
+          style={{
+            backgroundColor: 'var(--color-background)',
+            borderTop: '1px solid var(--color-border)',
+          }}
+        >
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex flex-col">
+              <span className="text-xs" style={{ color: 'var(--color-text)', opacity: 0.5 }}>
+                Total
+              </span>
+              <span className="text-lg font-bold" style={{ color: 'var(--color-text)' }}>
+                {formatPrice(total, currency)}
+              </span>
+            </div>
+            <Link
+              href={getStorePermalink(domain, '/checkout')}
+              className="h-14 flex-1 max-w-[240px] text-sm font-semibold rounded-lg transition-opacity hover:opacity-90 flex items-center justify-center"
+              style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-background)' }}
+            >
+              Proceed to Checkout
+            </Link>
+          </div>
         </div>
       </div>
     </section>
