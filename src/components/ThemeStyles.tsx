@@ -10,6 +10,7 @@ export default function ThemeStyles() {
   const { theme } = useTheme();
   const brand = theme?.settings?.brand;
 
+
   const primary    = brand?.primary    || '#2563EB';
   const background = brand?.background || '#ffffff';
   const text       = brand?.text       || '#374151';
