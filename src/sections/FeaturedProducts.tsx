@@ -48,6 +48,7 @@ export default function FeaturedProducts() {
   const collectionHandle = products_settings.collection || 'all';
   const limit = parseInt(products_settings.limit || '8');
   const columns = parseInt(products_settings.columns || '4');
+  const viewAllLink = products_settings.viewAllLink || `/collections/${collectionHandle}`;
 
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -118,7 +119,7 @@ export default function FeaturedProducts() {
             {heading}
           </h2>
           <Link
-            href={getStorePermalink(domain, `/collections/${collectionHandle}`)}
+            href={getStorePermalink(domain, viewAllLink)}
             className="text-base font-medium transition-opacity hover:opacity-70"
             style={{ color: 'var(--color-primary)' }}
           >

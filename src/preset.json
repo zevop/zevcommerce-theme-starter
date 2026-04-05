@@ -36,7 +36,8 @@
       "heading": "Featured Products",
       "collection": "all",
       "limit": 8,
-      "columns": "4"
+      "columns": "4",
+      "viewAllLink": "/collections/all"
     },
     "contact": {
       "enabled": false,
