@@ -45,7 +45,7 @@ export default function Hero() {
           className="absolute inset-0"
           style={{ backgroundColor: overlayColor, opacity: overlayOpacity }}
         />
-        <div className="relative z-10 container mx-auto px-5 py-16 text-center">
+        <div className="relative z-10 container mx-auto px-5 py-16 md:py-24 text-center">
           <h1
             className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 leading-tight"
             style={{ color: textColor }}
@@ -63,7 +63,7 @@ export default function Hero() {
           {buttonText && (
             <Link
               href={getStorePermalink(domain, buttonLink)}
-              className="inline-flex items-center justify-center px-8 py-4 min-h-[3.5rem] text-base font-semibold rounded-lg transition-opacity hover:opacity-90"
+              className="inline-flex items-center justify-center px-8 py-4 min-h-[3.5rem] text-base font-semibold rounded-full transition-all hover:opacity-90 hover:scale-[1.02] shadow-lg"
               style={{ backgroundColor: '#ffffff', color: '#111827' }}
             >
               {buttonText}
@@ -74,13 +74,31 @@ export default function Hero() {
     );
   }
 
-  // Without image: clean text banner on branded background
+  // Without image: gradient or solid branded background
+  const gradientStart = hero.fallbackGradientStart;
+  const gradientEnd = hero.fallbackGradientEnd;
+  const hasGradient = gradientStart && gradientEnd;
+
+  const bgStyle = hasGradient
+    ? { background: `linear-gradient(135deg, ${gradientStart}, ${gradientEnd})` }
+    : { background: `linear-gradient(135deg, var(--color-primary), var(--color-accent))` };
+
   return (
     <section
-      className="py-16 md:py-24"
-      style={{ backgroundColor: 'var(--color-primary)' }}
+      className="relative py-20 md:py-28 overflow-hidden"
+      style={bgStyle}
     >
-      <div className="container mx-auto px-5 text-center">
+      {/* Subtle decorative shape */}
+      <div
+        className="absolute -top-20 -right-20 w-64 h-64 rounded-full opacity-10"
+        style={{ backgroundColor: '#ffffff' }}
+      />
+      <div
+        className="absolute -bottom-16 -left-16 w-48 h-48 rounded-full opacity-[0.07]"
+        style={{ backgroundColor: '#ffffff' }}
+      />
+
+      <div className="relative z-10 container mx-auto px-5 text-center">
         <h1
           className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 leading-tight"
           style={{ color: textColor }}
@@ -98,7 +116,7 @@ export default function Hero() {
         {buttonText && (
           <Link
             href={getStorePermalink(domain, buttonLink)}
-            className="inline-flex items-center justify-center px-8 py-4 min-h-[3.5rem] text-base font-semibold rounded-lg transition-opacity hover:opacity-90"
+            className="inline-flex items-center justify-center px-8 py-4 min-h-[3.5rem] text-base font-semibold rounded-full transition-all hover:opacity-90 hover:scale-[1.02] shadow-lg"
             style={{ backgroundColor: '#ffffff', color: 'var(--color-primary)' }}
           >
             {buttonText}

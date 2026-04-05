@@ -7,21 +7,22 @@ import { useParams } from 'next/navigation';
 
 function PlaceholderCard() {
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col group">
       <div
-        className="aspect-[3/4] rounded-lg flex items-center justify-center"
-        style={{ backgroundColor: '#f5f5f5' }}
+        className="aspect-[3/4] rounded-xl flex items-center justify-center relative overflow-hidden"
+        style={{ backgroundColor: 'var(--color-secondary)' }}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          width="28"
-          height="28"
+          width="32"
+          height="32"
           viewBox="0 0 24 24"
           fill="none"
-          stroke="#d4d4d4"
-          strokeWidth="1"
+          stroke="var(--color-border)"
+          strokeWidth="1.2"
           strokeLinecap="round"
           strokeLinejoin="round"
+          className="opacity-60"
         >
           <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
           <line x1="3" y1="6" x2="21" y2="6" />
@@ -29,8 +30,14 @@ function PlaceholderCard() {
         </svg>
       </div>
       <div className="mt-3 space-y-2 px-0.5">
-        <div className="h-2.5 w-2/3 rounded" style={{ backgroundColor: '#ebebeb' }} />
-        <div className="h-2.5 w-1/4 rounded" style={{ backgroundColor: '#f0f0f0' }} />
+        <div
+          className="h-3 w-3/4 rounded-full"
+          style={{ backgroundColor: 'var(--color-border)', opacity: 0.6 }}
+        />
+        <div
+          className="h-3 w-1/3 rounded-full"
+          style={{ backgroundColor: 'var(--color-border)', opacity: 0.35 }}
+        />
       </div>
     </div>
   );
@@ -111,24 +118,25 @@ export default function FeaturedProducts() {
     <section className="py-12 md:py-16" style={{ backgroundColor: 'var(--color-background)' }}>
       <div className="container mx-auto px-5 sm:px-6">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-baseline justify-between mb-6 md:mb-8">
           <h2
-            className="text-lg md:text-2xl font-bold"
+            className="text-xl md:text-2xl font-bold"
             style={{ color: 'var(--color-text)' }}
           >
             {heading}
           </h2>
           <Link
             href={getStorePermalink(domain, viewAllLink)}
-            className="text-base font-medium transition-opacity hover:opacity-70"
+            className="text-sm md:text-base font-medium transition-colors hover:opacity-70 flex items-center gap-1"
             style={{ color: 'var(--color-primary)' }}
           >
             View All
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
           </Link>
         </div>
 
         {/* Grid */}
-        <div className={`grid grid-cols-2 ${gridColsClass} gap-4 sm:gap-6`}>
+        <div className={`grid grid-cols-2 ${gridColsClass} gap-3 sm:gap-5 md:gap-6`}>
           {products.length > 0
             ? products.map(product => (
                 <ProductCard
