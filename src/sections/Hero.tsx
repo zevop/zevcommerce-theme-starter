@@ -20,9 +20,6 @@ export default function Hero() {
   const overlayColor = hero.overlayColor || '#000000';
   const textColor = hero.textColor || '#ffffff';
 
-  const fallbackGradientStart = hero.fallbackGradientStart || 'var(--color-primary)';
-  const fallbackGradientEnd = hero.fallbackGradientEnd || 'var(--color-accent)';
-
   const resolveImage = (img: any) => {
     if (!img) return undefined;
     if (typeof img === 'string') return img;
@@ -38,9 +35,9 @@ export default function Hero() {
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }
-    : {
-        background: `linear-gradient(160deg, ${fallbackGradientStart} 0%, ${fallbackGradientEnd} 100%)`,
-      };
+    : hero.fallbackGradientStart && hero.fallbackGradientEnd
+      ? { background: `linear-gradient(160deg, ${hero.fallbackGradientStart} 0%, ${hero.fallbackGradientEnd} 100%)` }
+      : { backgroundColor: 'var(--color-primary)' };
 
   return (
     <section

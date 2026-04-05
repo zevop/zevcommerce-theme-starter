@@ -9,35 +9,28 @@ function PlaceholderCard() {
   return (
     <div className="flex flex-col">
       <div
-        className="aspect-[3/4] rounded-xl flex items-center justify-center"
-        style={{ backgroundColor: 'var(--color-secondary)' }}
+        className="aspect-[3/4] rounded-lg flex items-center justify-center"
+        style={{ backgroundColor: '#f5f5f5' }}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          width="32"
-          height="32"
+          width="28"
+          height="28"
           viewBox="0 0 24 24"
           fill="none"
-          stroke="currentColor"
+          stroke="#d4d4d4"
           strokeWidth="1"
           strokeLinecap="round"
           strokeLinejoin="round"
-          style={{ color: 'var(--color-border)', opacity: 0.5 }}
         >
           <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
           <line x1="3" y1="6" x2="21" y2="6" />
           <path d="M16 10a4 4 0 0 1-8 0" />
         </svg>
       </div>
-      <div className="mt-3 space-y-2.5 px-0.5">
-        <div
-          className="h-3 w-2/3 rounded"
-          style={{ backgroundColor: 'var(--color-border)', opacity: 0.4 }}
-        />
-        <div
-          className="h-3 w-1/4 rounded"
-          style={{ backgroundColor: 'var(--color-border)', opacity: 0.3 }}
-        />
+      <div className="mt-3 space-y-2 px-0.5">
+        <div className="h-2.5 w-2/3 rounded" style={{ backgroundColor: '#ebebeb' }} />
+        <div className="h-2.5 w-1/4 rounded" style={{ backgroundColor: '#f0f0f0' }} />
       </div>
     </div>
   );
