@@ -246,7 +246,7 @@ export default function ProductDetail() {
       {/* Sticky Add to Cart Bar (mobile only) */}
       <div className="lg:hidden">
         <div
-          className="fixed bottom-0 left-0 right-0 z-40 px-5 pt-3 pb-[env(safe-area-inset-bottom)]"
+          className="fixed bottom-16 left-0 right-0 z-40 px-5 pt-3 pb-2"
           style={{
             backgroundColor: 'var(--color-background)',
             borderTop: '1px solid var(--color-border)',

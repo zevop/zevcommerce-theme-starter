@@ -7,22 +7,21 @@ import { useParams } from 'next/navigation';
 
 function PlaceholderCard() {
   return (
-    <div className="flex flex-col group">
+    <div className="flex flex-col">
       <div
-        className="aspect-[3/4] rounded-xl flex items-center justify-center relative overflow-hidden"
-        style={{ backgroundColor: 'var(--color-secondary)' }}
+        className="aspect-[3/4] rounded-xl flex items-center justify-center"
+        style={{ backgroundColor: '#f5f5f5' }}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          width="32"
-          height="32"
+          width="28"
+          height="28"
           viewBox="0 0 24 24"
           fill="none"
-          stroke="var(--color-border)"
-          strokeWidth="1.2"
+          stroke="#d4d4d4"
+          strokeWidth="1"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="opacity-60"
         >
           <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
           <line x1="3" y1="6" x2="21" y2="6" />
@@ -30,14 +29,8 @@ function PlaceholderCard() {
         </svg>
       </div>
       <div className="mt-3 space-y-2 px-0.5">
-        <div
-          className="h-3 w-3/4 rounded-full"
-          style={{ backgroundColor: 'var(--color-border)', opacity: 0.6 }}
-        />
-        <div
-          className="h-3 w-1/3 rounded-full"
-          style={{ backgroundColor: 'var(--color-border)', opacity: 0.35 }}
-        />
+        <div className="h-2.5 w-2/3 rounded" style={{ backgroundColor: '#ebebeb' }} />
+        <div className="h-2.5 w-1/4 rounded" style={{ backgroundColor: '#f0f0f0' }} />
       </div>
     </div>
   );
@@ -55,7 +48,7 @@ export default function FeaturedProducts() {
   const collectionHandle = products_settings.collection || 'all';
   const limit = parseInt(products_settings.limit || '8');
   const columns = parseInt(products_settings.columns || '4');
-  const viewAllLink = products_settings.viewAllLink || `/collections/${collectionHandle}`;
+  const viewAllLink = products_settings.viewAllLink || '/collections/';
 
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);

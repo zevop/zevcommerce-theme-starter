@@ -78,7 +78,7 @@ export const settingsSchema = defineSettings([
       { type: 'text', id: 'products.heading', label: 'Section Heading', default: 'Featured Products' },
       { type: 'collection_picker', id: 'products.collection', label: 'Collection', default: 'all' },
       { type: 'range', id: 'products.limit', label: 'Number of Products', min: 4, max: 24, step: 4, default: 8 },
-      { type: 'text', id: 'products.viewAllLink', label: 'View All Link', default: '/collections/all' },
+      { type: 'text', id: 'products.viewAllLink', label: 'View All Link', default: '/collections/' },
       {
         type: 'select',
         id: 'products.columns',

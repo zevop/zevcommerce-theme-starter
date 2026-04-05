@@ -2,14 +2,17 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { useTheme, useCartStore, resolveMenuUrl, getStorePermalink, getProducts } from '@zevcommerce/storefront-api';
-import { useRouter, useParams } from 'next/navigation';
+import { useTheme, useCartStore, useCustomerAuth, resolveMenuUrl, getStorePermalink, getProducts } from '@zevcommerce/storefront-api';
+import { useRouter, useParams, usePathname } from 'next/navigation';
 
 export default function Header() {
   const { theme, storeConfig, menus } = useTheme();
   const { openCart, items } = useCartStore();
+  const { customer } = useCustomerAuth();
   const router = useRouter();
   const params = useParams();
+  const pathname = usePathname();
+  const accountsEnabled = !!storeConfig?.accountConfig?.loginEnabled;
 
   const header = theme?.settings?.header;
   const logoSrc = header?.logo || storeConfig?.storeLogo;
@@ -35,6 +38,11 @@ export default function Header() {
   const searchRef = useRef<HTMLInputElement>(null);
 
   const cartCount = items.reduce((sum, item) => sum + item.quantity, 0);
+
+  // Determine active tab from pathname
+  const isHome = pathname === getStorePermalink(domain, '/') || pathname === `/${domain}`;
+  const isCollections = pathname?.includes('/collections');
+  const isCart = pathname?.includes('/cart');
 
   // Lock body scroll
   useEffect(() => {
@@ -87,6 +95,7 @@ export default function Header() {
 
   return (
     <>
+      {/* Top Header */}
       <header
         style={{
           backgroundColor: 'var(--color-background)',
@@ -130,9 +139,21 @@ export default function Header() {
               ))}
             </nav>
 
-            {/* Icons */}
-            <div className="flex items-center gap-3">
-              {/* Search */}
+            {/* Desktop Icons */}
+            <div className="hidden md:flex items-center gap-3">
+              {accountsEnabled && (
+                <Link
+                  href={getStorePermalink(domain, '/account')}
+                  aria-label="Account"
+                  className="min-w-[48px] min-h-[48px] flex items-center justify-center transition-opacity hover:opacity-70"
+                  style={{ color: 'var(--color-text)' }}
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                </Link>
+              )}
               {showSearch && (
                 <button
                   onClick={() => setSearchOpen(true)}
@@ -146,8 +167,6 @@ export default function Header() {
                   </svg>
                 </button>
               )}
-
-              {/* Cart */}
               <button
                 onClick={openCart}
                 aria-label="Cart"
@@ -168,24 +187,119 @@ export default function Header() {
                   </span>
                 )}
               </button>
+            </div>
 
-              {/* Mobile hamburger */}
-              <button
-                onClick={() => setMobileOpen(true)}
-                aria-label="Open menu"
-                className="md:hidden min-w-[48px] min-h-[48px] flex items-center justify-center transition-opacity hover:opacity-70"
-                style={{ color: 'var(--color-text)' }}
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="3" y1="6" x2="21" y2="6" />
-                  <line x1="3" y1="12" x2="21" y2="12" />
-                  <line x1="3" y1="18" x2="21" y2="18" />
-                </svg>
-              </button>
+            {/* Mobile: search + cart in top bar */}
+            <div className="flex md:hidden items-center gap-1">
+              {showSearch && (
+                <button
+                  onClick={() => setSearchOpen(true)}
+                  aria-label="Search"
+                  className="min-w-[44px] min-h-[44px] flex items-center justify-center transition-opacity hover:opacity-70"
+                  style={{ color: 'var(--color-text)' }}
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="11" cy="11" r="8" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                  </svg>
+                </button>
+              )}
             </div>
           </div>
         </div>
       </header>
+
+      {/* Mobile Bottom Navigation */}
+      <nav
+        className="md:hidden fixed bottom-0 left-0 right-0 z-50"
+        style={{
+          backgroundColor: 'var(--color-background)',
+          borderTop: '1px solid var(--color-border)',
+        }}
+      >
+        <div className="flex items-center justify-around px-2" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+          {/* Home */}
+          <Link
+            href={getStorePermalink(domain, '/')}
+            className="flex flex-col items-center py-2 px-3 min-w-[56px]"
+            style={{ color: isHome ? 'var(--color-primary)' : 'var(--color-text)', opacity: isHome ? 1 : 0.4 }}
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill={isHome ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+              {!isHome && <polyline points="9 22 9 12 15 12 15 22" />}
+            </svg>
+            <span className="text-[10px] font-medium mt-0.5">Home</span>
+          </Link>
+
+          {/* Shop */}
+          <Link
+            href={getStorePermalink(domain, '/collections/all')}
+            className="flex flex-col items-center py-2 px-3 min-w-[56px]"
+            style={{ color: isCollections ? 'var(--color-primary)' : 'var(--color-text)', opacity: isCollections ? 1 : 0.4 }}
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="3" width="7" height="7" rx="1" fill={isCollections ? 'currentColor' : 'none'} />
+              <rect x="14" y="3" width="7" height="7" rx="1" fill={isCollections ? 'currentColor' : 'none'} />
+              <rect x="3" y="14" width="7" height="7" rx="1" fill={isCollections ? 'currentColor' : 'none'} />
+              <rect x="14" y="14" width="7" height="7" rx="1" fill={isCollections ? 'currentColor' : 'none'} />
+            </svg>
+            <span className="text-[10px] font-medium mt-0.5">Shop</span>
+          </Link>
+
+          {/* Cart — Floating center button */}
+          <button
+            onClick={openCart}
+            className="relative -mt-5 flex items-center justify-center w-14 h-14 rounded-full shadow-lg"
+            style={{ backgroundColor: 'var(--color-primary)' }}
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <path d="M16 10a4 4 0 01-8 0" />
+            </svg>
+            {cartCount > 0 && (
+              <span
+                className="absolute -top-1 -right-1 text-[10px] font-bold min-w-[20px] h-[20px] flex items-center justify-center rounded-full px-1 border-2"
+                style={{ backgroundColor: 'var(--color-accent)', color: '#ffffff', borderColor: 'var(--color-background)' }}
+              >
+                {cartCount}
+              </span>
+            )}
+          </button>
+
+          {/* Account (when enabled) or Menu */}
+          {accountsEnabled ? (
+            <Link
+              href={getStorePermalink(domain, '/account')}
+              className="flex flex-col items-center py-2 px-3 min-w-[56px]"
+              style={{ color: pathname?.includes('/account') ? 'var(--color-primary)' : 'var(--color-text)', opacity: pathname?.includes('/account') ? 1 : 0.4 }}
+            >
+              <svg width="22" height="22" viewBox="0 0 24 24" fill={customer ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+              <span className="text-[10px] font-medium mt-0.5">Account</span>
+            </Link>
+          ) : (
+            <div className="min-w-[56px]" />
+          )}
+
+          {/* Menu */}
+          <button
+            onClick={() => setMobileOpen(true)}
+            className="flex flex-col items-center py-2 px-3 min-w-[56px]"
+            style={{ color: 'var(--color-text)', opacity: 0.4 }}
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+            <span className="text-[10px] font-medium mt-0.5">Menu</span>
+          </button>
+        </div>
+      </nav>
+
 
       {/* Search Overlay */}
       {searchOpen && (
@@ -248,7 +362,7 @@ export default function Header() {
         </div>
       )}
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu Drawer */}
       {mobileOpen && (
         <div className="fixed inset-0 z-[200] md:hidden">
           <div

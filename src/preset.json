@@ -37,7 +37,7 @@
       "collection": "all",
       "limit": 8,
       "columns": "4",
-      "viewAllLink": "/collections/all"
+      "viewAllLink": "/collections/"
     },
     "contact": {
       "enabled": false,
