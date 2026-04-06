@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useTheme, getCollection, ProductCard, getStorePermalink } from '@zevcommerce/storefront-api';
+import { useTheme, getCollection, getProducts, ProductCard, getStorePermalink } from '@zevcommerce/storefront-api';
 import { useParams } from 'next/navigation';
 
 function PlaceholderCard() {
@@ -55,20 +55,33 @@ export default function FeaturedProducts() {
 
   useEffect(() => {
     async function fetchData() {
-      if (!domain || !collectionHandle) {
+      if (!domain) {
         setLoading(false);
         return;
       }
       setLoading(true);
       try {
-        const collection = await getCollection(domain, collectionHandle);
-        if (collection) {
-          const productList = collection.products?.map((p: any) => p.product || p) || [];
-          setProducts(productList.slice(0, limit));
+        // If no specific collection or 'all', fetch all published products directly
+        if (!collectionHandle || collectionHandle === 'all') {
+          const { data } = await getProducts(domain, 1, limit);
+          setProducts(data || []);
+        } else {
+          const collection = await getCollection(domain, collectionHandle);
+          if (collection) {
+            const productList = collection.products?.map((p: any) => p.product || p) || [];
+            setProducts(productList.slice(0, limit));
+          }
         }
       } catch (error: any) {
         if (error?.response?.status !== 404) {
           console.error('Error fetching products:', error);
+        }
+        // Fallback: try fetching all products
+        try {
+          const { data } = await getProducts(domain, 1, limit);
+          setProducts(data || []);
+        } catch {
+          // swallow
         }
       } finally {
         setLoading(false);

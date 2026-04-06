@@ -233,7 +233,7 @@ export default function Header() {
 
           {/* Shop */}
           <Link
-            href={getStorePermalink(domain, '/collections/all')}
+            href={getStorePermalink(domain, '/collections/')}
             className="flex flex-col items-center py-2 px-3 min-w-[56px]"
             style={{ color: isCollections ? 'var(--color-primary)' : 'var(--color-text)', opacity: isCollections ? 1 : 0.4 }}
           >

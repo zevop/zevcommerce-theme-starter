@@ -137,15 +137,23 @@ export default function Footer() {
           )}
 
           {/* Store info */}
-          <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider mb-4" style={{ color: 'var(--color-text)' }}>
-              Store
-            </h3>
-            <div className="flex flex-col gap-2.5 text-base" style={{ color: 'var(--color-text)', opacity: 0.6 }}>
-              {storeConfig?.email && <p>{storeConfig.email}</p>}
-              {storeConfig?.phone && <p>{storeConfig.phone}</p>}
-            </div>
-          </div>
+          {(() => {
+            const contact = theme?.settings?.contact;
+            const hasContact = contact?.phone || contact?.email || contact?.whatsapp;
+            if (!hasContact) return null;
+            return (
+              <div>
+                <h3 className="text-sm font-semibold uppercase tracking-wider mb-4" style={{ color: 'var(--color-text)' }}>
+                  Contact
+                </h3>
+                <div className="flex flex-col gap-2.5 text-base" style={{ color: 'var(--color-text)', opacity: 0.6 }}>
+                  {contact?.phone && <a href={`tel:${contact.phone}`} className="hover:opacity-100 transition-opacity">{contact.phone}</a>}
+                  {contact?.email && <a href={`mailto:${contact.email}`} className="hover:opacity-100 transition-opacity">{contact.email}</a>}
+                  {contact?.whatsapp && <a href={`https://wa.me/${contact.whatsapp.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="hover:opacity-100 transition-opacity">WhatsApp</a>}
+                </div>
+              </div>
+            );
+          })()}
         </div>
 
         {/* Copyright */}

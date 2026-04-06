@@ -38,20 +38,58 @@ export default function ProductDetail() {
   const hasVariants = variants.length > 1;
 
   const currentVariant = selectedVariant || variants[0];
-  const price = parseFloat(currentVariant?.price || product.price || '0');
-  const compareAtPrice = parseFloat(currentVariant?.compareAtPrice || product.compareAtPrice || '0');
+  const price = parseFloat(currentVariant?.price || '0');
+  const compareAtPrice = parseFloat(currentVariant?.compareAtPrice || '0');
   const isOnSale = compareAtPrice > 0 && compareAtPrice > price;
 
-  // Group variant options
+  // Group options for display: prefer product.options (source of truth) when available,
+  // otherwise derive from each variant's selectedOptions
   const optionGroups: Record<string, string[]> = {};
-  variants.forEach((v: any) => {
-    (v.options || []).forEach((opt: any) => {
-      if (!optionGroups[opt.name]) optionGroups[opt.name] = [];
-      if (!optionGroups[opt.name].includes(opt.value)) {
-        optionGroups[opt.name].push(opt.value);
-      }
+  const productOptions = (product as any).options;
+  if (Array.isArray(productOptions) && productOptions.length > 0) {
+    productOptions.forEach((opt: any) => {
+      optionGroups[opt.name] = Array.isArray(opt.values) ? [...opt.values] : [];
     });
-  });
+  } else {
+    // Fallback: derive from variants' selectedOptions
+    variants.forEach((v: any) => {
+      (v.selectedOptions || []).forEach((opt: any) => {
+        if (!optionGroups[opt.name]) optionGroups[opt.name] = [];
+        if (!optionGroups[opt.name].includes(opt.value)) {
+          optionGroups[opt.name].push(opt.value);
+        }
+      });
+    });
+  }
+
+  // Multi-option variant selection: build the set of currently selected options,
+  // update the clicked option, then find the variant that matches ALL selected options
+  const handleOptionChange = (optionName: string, value: string) => {
+    // Start from current variant's selectedOptions
+    const currentOptions: Record<string, string> = {};
+    (currentVariant?.selectedOptions || []).forEach((o: any) => {
+      currentOptions[o.name] = o.value;
+    });
+    currentOptions[optionName] = value;
+
+    // Find a variant that matches every selected option
+    const match = variants.find((v: any) => {
+      const vOpts = v.selectedOptions || [];
+      return Object.entries(currentOptions).every(([name, val]) =>
+        vOpts.some((o: any) => o.name === name && o.value === val)
+      );
+    });
+
+    if (match) {
+      setSelectedVariant(match);
+    } else {
+      // Fallback: find any variant that has at least the newly selected value
+      const fallback = variants.find((v: any) =>
+        v.selectedOptions?.some((o: any) => o.name === optionName && o.value === value)
+      );
+      if (fallback) setSelectedVariant(fallback);
+    }
+  };
 
   const handleAddToCart = () => {
     if (!currentVariant) return;
@@ -60,9 +98,9 @@ export default function ProductDetail() {
       productId: product.id,
       title: product.title,
       variantTitle: currentVariant.title || '',
-      price: currentVariant.price,
+      price: parseFloat(currentVariant.price || '0'),
       quantity,
-      image: images[0]?.url || '',
+      image: images[0]?.url || null,
       slug: product.slug,
     });
     setAddedToCart(true);
@@ -77,7 +115,7 @@ export default function ProductDetail() {
         <nav className="flex items-center gap-2 text-xs mb-8" style={{ color: 'var(--color-text)', opacity: 0.5 }}>
           <Link href={getStorePermalink(domain, '/')} className="hover:opacity-70 transition-opacity">Home</Link>
           <span>/</span>
-          <Link href={getStorePermalink(domain, '/collections/all')} className="hover:opacity-70 transition-opacity">Products</Link>
+          <Link href={getStorePermalink(domain, '/collections/')} className="hover:opacity-70 transition-opacity">Products</Link>
           <span>/</span>
           <span style={{ opacity: 1, color: 'var(--color-text)' }}>{product.title}</span>
         </nav>
@@ -155,7 +193,7 @@ export default function ProductDetail() {
 
             {/* Variant Selectors */}
             {hasVariants && Object.entries(optionGroups).map(([optionName, values]) => {
-              const currentValue = currentVariant?.options?.find((o: any) => o.name === optionName)?.value;
+              const currentValue = currentVariant?.selectedOptions?.find((o: any) => o.name === optionName)?.value;
               return (
                 <div key={optionName} className="mb-5">
                   <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text)' }}>
@@ -167,12 +205,7 @@ export default function ProductDetail() {
                       return (
                         <button
                           key={val}
-                          onClick={() => {
-                            const match = variants.find((v: any) =>
-                              v.options?.some((o: any) => o.name === optionName && o.value === val)
-                            );
-                            if (match) setSelectedVariant(match);
-                          }}
+                          onClick={() => handleOptionChange(optionName, val)}
                           className="px-5 py-2 text-sm border rounded transition-colors min-h-[3rem]"
                           style={{
                             backgroundColor: isSelected ? 'var(--color-primary)' : 'transparent',

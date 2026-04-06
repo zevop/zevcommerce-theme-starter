@@ -107,6 +107,10 @@
     "main-checkout": {
       "type": "checkout-page",
       "settings": {}
+    },
+    "main-thank-you": {
+      "type": "thank-you",
+      "settings": {}
     }
   },
   "layout": {
@@ -127,6 +131,7 @@
     "product_detail": { "order": ["main-product"] },
     "collection": { "order": ["main-collection"] },
     "cart": { "order": ["main-cart"] },
-    "checkout": { "order": ["main-checkout"] }
+    "checkout": { "order": ["main-checkout"] },
+    "thank_you": { "order": ["main-thank-you"] }
   }
 }
