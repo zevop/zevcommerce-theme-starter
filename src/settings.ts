@@ -39,9 +39,10 @@ export const settingsSchema = defineSettings([
     settings: [
       { type: 'image', id: 'header.logo', label: 'Logo Image' },
       { type: 'range', id: 'header.logoHeight', label: 'Logo Height (px)', min: 20, max: 80, step: 4, default: 36 },
+      { type: 'image', id: 'header.favicon', label: 'Favicon (optional — defaults to logo)' },
       { type: 'checkbox', id: 'header.sticky', label: 'Sticky Header', default: true },
       { type: 'checkbox', id: 'header.showSearch', label: 'Show Search Icon', default: true },
-      { type: 'text', id: 'header.menuHandle', label: 'Menu Handle', default: 'main-menu' },
+      { type: 'link_list', id: 'header.menuHandle', label: 'Main Menu', default: 'main-menu' },
     ],
   },
 
@@ -121,7 +122,7 @@ export const settingsSchema = defineSettings([
     icon: 'align-bottom',
     settings: [
       { type: 'textarea', id: 'footer.description', label: 'Store Description', default: '' },
-      { type: 'text', id: 'footer.menuHandle', label: 'Footer Menu Handle', default: 'footer' },
+      { type: 'link_list', id: 'footer.menuHandle', label: 'Footer Menu', default: 'footer' },
       { type: 'text', id: 'footer.copyright', label: 'Copyright Text', default: '' },
       { type: 'text', id: 'footer.instagram', label: 'Instagram URL', default: '' },
       { type: 'text', id: 'footer.facebook', label: 'Facebook URL', default: '' },
