@@ -11,7 +11,12 @@ import { useParams } from 'next/navigation';
 const PRESET_HEADING = 'Welcome to our store';
 const PRESET_SUBHEADING = 'Discover amazing products at great prices.';
 
-// Scoped responsive styles for the hero section spacing
+// Scoped responsive styles for the hero section spacing. The
+// `.hero-bg-image` rule swaps the background image below the md
+// breakpoint when a merchant-uploaded mobile image is present — CSS
+// custom props (set inline per-instance) feed both images in so a
+// single shared class can serve every store. Falls back to the
+// desktop image when `--hero-bg-mobile` is unset.
 const heroResponsiveCSS = `
 .hero-section-wrapper {
   max-width: 1280px;
@@ -28,6 +33,16 @@ const heroResponsiveCSS = `
     padding-right: 24px;
     padding-top: 24px;
     padding-bottom: 32px;
+  }
+}
+.hero-bg-image {
+  background-image: var(--hero-bg-desktop);
+  background-size: cover;
+  background-position: center;
+}
+@media (max-width: 767px) {
+  .hero-bg-image {
+    background-image: var(--hero-bg-mobile, var(--hero-bg-desktop));
   }
 }
 `;
@@ -58,6 +73,7 @@ export default function Hero() {
   };
 
   const bgImage = resolveImage(hero.backgroundImage);
+  const mobileBgImage = resolveImage(hero.mobileBackgroundImage);
   const hasCustomGradient = hero.fallbackGradientStart && hero.fallbackGradientEnd;
 
   // Check if merchant has customized the hero beyond defaults. Compared
@@ -161,11 +177,16 @@ export default function Hero() {
         <section className="hero-section-wrapper">
           {wrapBanner(
             <div
-              className="relative flex items-center justify-center min-h-[50vh] md:min-h-[65vh] rounded-2xl overflow-hidden"
+              className="hero-bg-image relative flex items-center justify-center min-h-[50vh] md:min-h-[65vh] rounded-2xl overflow-hidden"
               style={{
-                backgroundImage: `url("${bgImage}")`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
+                // CSS custom props feed both images in — the shared
+                // @media rule swaps to the mobile image below 768px
+                // when set, otherwise the desktop image is used at
+                // every width (today's behavior).
+                ['--hero-bg-desktop' as any]: `url("${bgImage}")`,
+                ...(mobileBgImage
+                  ? { ['--hero-bg-mobile' as any]: `url("${mobileBgImage}")` }
+                  : {}),
               }}
             >
               <div
