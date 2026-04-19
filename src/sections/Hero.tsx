@@ -4,8 +4,12 @@ import Link from 'next/link';
 import { useTheme, getStorePermalink } from '@zevcommerce/storefront-api';
 import { useParams } from 'next/navigation';
 
-const DEFAULT_HEADING = 'Welcome to our store';
-const DEFAULT_SUBHEADING = 'Discover amazing products at great prices.';
+// Starter values that ship in preset.json. Kept here ONLY as a
+// sentinel for `isCustomized` so we can tell "merchant hasn't touched
+// the hero yet" from "merchant deliberately cleared it." They are NOT
+// rendered — an empty heading stays empty.
+const PRESET_HEADING = 'Welcome to our store';
+const PRESET_SUBHEADING = 'Discover amazing products at great prices.';
 
 // Scoped responsive styles for the hero section spacing
 const heroResponsiveCSS = `
@@ -36,10 +40,14 @@ export default function Hero() {
   const hero = theme?.settings?.hero;
   if (!hero?.enabled) return null;
 
-  const heading = hero.heading || DEFAULT_HEADING;
+  // Render merchant-entered values as-is. An empty heading stays
+  // empty — NO fallback to the preset text — so merchants who clear
+  // the field get an image-only or subheading-only banner.
+  const heading = hero.heading || '';
   const subheading = hero.subheading || '';
-  const buttonText = hero.buttonText || 'Shop Now';
+  const buttonText = hero.buttonText || '';
   const buttonLink = hero.buttonLink || '/collections/all';
+  const bannerLink = hero.bannerLink || '';
   const textColor = hero.textColor || '#ffffff';
 
   const resolveImage = (img: any) => {
@@ -52,11 +60,16 @@ export default function Hero() {
   const bgImage = resolveImage(hero.backgroundImage);
   const hasCustomGradient = hero.fallbackGradientStart && hero.fallbackGradientEnd;
 
-  // Check if merchant has customized the hero beyond defaults
+  // Check if merchant has customized the hero beyond defaults. Compared
+  // against PRESET_* so a first-time store (heading still equal to the
+  // preset text) shows the placeholder, but a deliberately-cleared
+  // heading does NOT — the presence of a bg image / subheading / the
+  // banner link itself is enough signal the merchant is using the hero.
   const isCustomized = bgImage
     || hasCustomGradient
-    || (hero.heading && hero.heading !== DEFAULT_HEADING)
-    || (hero.subheading && hero.subheading !== DEFAULT_SUBHEADING);
+    || !!bannerLink
+    || (hero.heading && hero.heading !== PRESET_HEADING)
+    || (hero.subheading && hero.subheading !== PRESET_SUBHEADING);
 
   // Placeholder: shown when merchant hasn't customized yet
   if (!isCustomized) {
@@ -101,6 +114,42 @@ export default function Hero() {
     );
   }
 
+  // If the merchant set a whole-banner link, the outer container
+  // becomes a <Link> — the button (if any) then renders as a visual
+  // span inside the link to avoid invalid nested <a> elements. When
+  // the banner is clickable-whole, its inner button isn't a separate
+  // navigation target; clicking anywhere goes to `bannerLink`.
+  const renderButton = (buttonBg: string, buttonColor: string) => {
+    if (!buttonText) return null;
+    const classes =
+      'inline-flex items-center justify-center px-8 py-4 min-h-[3.5rem] text-base font-semibold rounded-lg transition-opacity hover:opacity-90';
+    const style = { backgroundColor: buttonBg, color: buttonColor };
+    if (bannerLink) {
+      return (
+        <span className={classes} style={style}>
+          {buttonText}
+        </span>
+      );
+    }
+    return (
+      <Link href={getStorePermalink(domain, buttonLink)} className={classes} style={style}>
+        {buttonText}
+      </Link>
+    );
+  };
+
+  const wrapBanner = (content: React.ReactNode) =>
+    bannerLink ? (
+      <Link
+        href={getStorePermalink(domain, bannerLink)}
+        className="block cursor-pointer no-underline"
+      >
+        {content}
+      </Link>
+    ) : (
+      <>{content}</>
+    );
+
   // With image: background with overlay
   if (bgImage) {
     const overlayOpacity = (hero.overlayOpacity ?? 50) / 100;
@@ -110,44 +159,40 @@ export default function Hero() {
       <>
         <style dangerouslySetInnerHTML={{ __html: heroResponsiveCSS }} />
         <section className="hero-section-wrapper">
-          <div
-            className="relative flex items-center justify-center min-h-[50vh] md:min-h-[65vh] rounded-2xl overflow-hidden"
-            style={{
-              backgroundImage: `url("${bgImage}")`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-            }}
-          >
+          {wrapBanner(
             <div
-              className="absolute inset-0"
-              style={{ backgroundColor: overlayColor, opacity: overlayOpacity }}
-            />
-            <div className="relative z-10 px-5 py-16 md:py-24 text-center">
-              <h1
-                className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 leading-tight"
-                style={{ color: textColor }}
-              >
-                {heading}
-              </h1>
-              {subheading && (
-                <p
-                  className="text-base sm:text-lg max-w-xl mx-auto mb-8 opacity-90"
-                  style={{ color: textColor }}
-                >
-                  {subheading}
-                </p>
-              )}
-              {buttonText && (
-                <Link
-                  href={getStorePermalink(domain, buttonLink)}
-                  className="inline-flex items-center justify-center px-8 py-4 min-h-[3.5rem] text-base font-semibold rounded-lg transition-opacity hover:opacity-90"
-                  style={{ backgroundColor: '#ffffff', color: '#111827' }}
-                >
-                  {buttonText}
-                </Link>
-              )}
-            </div>
-          </div>
+              className="relative flex items-center justify-center min-h-[50vh] md:min-h-[65vh] rounded-2xl overflow-hidden"
+              style={{
+                backgroundImage: `url("${bgImage}")`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+              }}
+            >
+              <div
+                className="absolute inset-0"
+                style={{ backgroundColor: overlayColor, opacity: overlayOpacity }}
+              />
+              <div className="relative z-10 px-5 py-16 md:py-24 text-center">
+                {heading && (
+                  <h1
+                    className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 leading-tight"
+                    style={{ color: textColor }}
+                  >
+                    {heading}
+                  </h1>
+                )}
+                {subheading && (
+                  <p
+                    className="text-base sm:text-lg max-w-xl mx-auto mb-8 opacity-90"
+                    style={{ color: textColor }}
+                  >
+                    {subheading}
+                  </p>
+                )}
+                {renderButton('#ffffff', '#111827')}
+              </div>
+            </div>,
+          )}
         </section>
       </>
     );
@@ -162,36 +207,29 @@ export default function Hero() {
     <>
       <style dangerouslySetInnerHTML={{ __html: heroResponsiveCSS }} />
       <section className="hero-section-wrapper">
-        <div
-          className="rounded-2xl py-16 md:py-24"
-          style={bgStyle}
-        >
-          <div className="px-5 text-center">
-            <h1
-              className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 leading-tight"
-              style={{ color: textColor }}
-            >
-              {heading}
-            </h1>
-            {subheading && (
-              <p
-                className="text-base sm:text-lg max-w-xl mx-auto mb-8 opacity-80"
-                style={{ color: textColor }}
-              >
-                {subheading}
-              </p>
-            )}
-            {buttonText && (
-              <Link
-                href={getStorePermalink(domain, buttonLink)}
-                className="inline-flex items-center justify-center px-8 py-4 min-h-[3.5rem] text-base font-semibold rounded-lg transition-opacity hover:opacity-90"
-                style={{ backgroundColor: '#ffffff', color: 'var(--color-primary)' }}
-              >
-                {buttonText}
-              </Link>
-            )}
-          </div>
-        </div>
+        {wrapBanner(
+          <div className="rounded-2xl py-16 md:py-24" style={bgStyle}>
+            <div className="px-5 text-center">
+              {heading && (
+                <h1
+                  className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 leading-tight"
+                  style={{ color: textColor }}
+                >
+                  {heading}
+                </h1>
+              )}
+              {subheading && (
+                <p
+                  className="text-base sm:text-lg max-w-xl mx-auto mb-8 opacity-80"
+                  style={{ color: textColor }}
+                >
+                  {subheading}
+                </p>
+              )}
+              {renderButton('#ffffff', 'var(--color-primary)')}
+            </div>
+          </div>,
+        )}
       </section>
     </>
   );
