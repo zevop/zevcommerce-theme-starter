@@ -116,6 +116,22 @@ export const settingsSchema = defineSettings([
         default: 320,
       },
 
+      { type: 'header', label: 'Banner background' },
+      {
+        type: 'checkbox',
+        id: 'hero.transparentBackground',
+        label: 'Transparent background (show page behind the image)',
+        default: false,
+      },
+      {
+        type: 'color',
+        id: 'hero.backgroundColor',
+        label: 'Background color (fills empty space around the image)',
+        default: '#f3f4f6',
+        // Hidden when transparent is on — the value is irrelevant then.
+        show_if: { id: 'hero.transparentBackground', value: false },
+      },
+
       { type: 'header', label: 'Slideshow settings' },
       { type: 'checkbox', id: 'hero.autoplay', label: 'Auto-advance slides', default: true },
       {

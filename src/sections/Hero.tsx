@@ -115,6 +115,13 @@ export default function Hero() {
   const autoplayMs = Math.max(3, hero.autoplayInterval ?? 5) * 1000;
   const desktopHeight = clampHeight(hero.height, 200, 800, 480);
   const mobileHeight = clampHeight(hero.heightMobile, 150, 600, 320);
+  // Letterbox fill behind the image. Transparent lets the page's own
+  // background show through for merchants who want the banner image
+  // to sit in the page with no frame — useful with PNGs that have
+  // their own shape or for a floating-hero look.
+  const frameBackground = hero.transparentBackground
+    ? 'transparent'
+    : (hero.backgroundColor || '#f3f4f6');
 
   return (
     <>
@@ -127,6 +134,7 @@ export default function Hero() {
           autoplayMs={autoplayMs}
           desktopHeight={desktopHeight}
           mobileHeight={mobileHeight}
+          frameBackground={frameBackground}
         />
       </section>
     </>
@@ -150,6 +158,7 @@ function Slideshow({
   autoplayMs,
   desktopHeight,
   mobileHeight,
+  frameBackground,
 }: {
   slides: Slide[];
   domain: string;
@@ -157,6 +166,7 @@ function Slideshow({
   autoplayMs: number;
   desktopHeight: number;
   mobileHeight: number;
+  frameBackground: string;
 }) {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -182,7 +192,7 @@ function Slideshow({
 
   return (
     <div
-      className="hero-frame relative rounded-2xl overflow-hidden bg-gray-100"
+      className="hero-frame relative rounded-2xl overflow-hidden"
       style={{
         display: 'grid',
         // CSS custom props consumed by `.hero-frame` rule in
@@ -190,6 +200,7 @@ function Slideshow({
         // value below 768px and the desktop value above.
         ['--hero-h-desktop' as any]: `${desktopHeight}px`,
         ['--hero-h-mobile' as any]: `${mobileHeight}px`,
+        backgroundColor: frameBackground,
       }}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
@@ -261,32 +272,19 @@ function SlideView({ slide, domain }: { slide: Slide; domain: string }) {
   const content = (
     <>
       {bg ? (
-        <>
-          {/* Blurred, zoomed fill. Sits behind the contained image and
-              softens any letterboxing into a natural-looking frame in
-              the image's own colors. `alt=""` because this copy is
-              purely decorative — the real image below carries meaning. */}
-          <picture className="absolute inset-0 block">
-            {mobileBg && <source media="(max-width: 767px)" srcSet={mobileBg} />}
-            <img
-              src={bg}
-              alt=""
-              aria-hidden="true"
-              className="w-full h-full object-cover scale-110 blur-2xl opacity-70"
-            />
-          </picture>
-
-          {/* The actual image — contained so nothing is cropped. */}
-          <picture className="absolute inset-0 flex items-center justify-center">
-            {mobileBg && <source media="(max-width: 767px)" srcSet={mobileBg} />}
-            <img
-              src={bg}
-              alt=""
-              className="w-full h-full object-contain"
-              loading="eager"
-            />
-          </picture>
-        </>
+        // Image is `object-contain`ed inside the frame so nothing is
+        // cropped. Any empty space around the image shows the frame's
+        // solid background color — the merchant can tune the banner
+        // height slider until the image fills the frame cleanly.
+        <picture className="absolute inset-0 flex items-center justify-center">
+          {mobileBg && <source media="(max-width: 767px)" srcSet={mobileBg} />}
+          <img
+            src={bg}
+            alt=""
+            className="w-full h-full object-contain"
+            loading="eager"
+          />
+        </picture>
       ) : (
         // Text-only slide: fall back to the theme's primary color so
         // the slide still looks like a deliberate banner.

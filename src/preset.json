@@ -23,6 +23,8 @@
       "autoplayInterval": 5,
       "height": 480,
       "heightMobile": 320,
+      "transparentBackground": false,
+      "backgroundColor": "#f3f4f6",
       "slides": [
         {
           "backgroundImage": null,
