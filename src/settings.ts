@@ -49,23 +49,79 @@ export const settingsSchema = defineSettings([
   // ============================================================
   // HERO BANNER
   // ============================================================
+  // Single-banner settings are kept for backward compatibility with
+  // stores created before multi-slide support — Hero.tsx falls back
+  // to these if `hero.slides` is empty. New stores should use the
+  // slides repeater below. The legacy fields render at the TOP so
+  // existing merchants see their familiar controls first.
   {
     name: 'Hero Banner',
     icon: 'image',
     settings: [
       { type: 'checkbox', id: 'hero.enabled', label: 'Show Hero', default: true },
-      { type: 'image', id: 'hero.backgroundImage', label: 'Background Image (recommended 2400×1300 landscape — keep key text/logo near the center)' },
-      { type: 'image', id: 'hero.mobileBackgroundImage', label: 'Mobile Background Image (optional — recommended 1080×1200 portrait — keep key text/logo near the center)' },
-      { type: 'text', id: 'hero.heading', label: 'Heading', default: 'Welcome to our store' },
-      { type: 'textarea', id: 'hero.subheading', label: 'Subheading', default: 'Discover amazing products at great prices.' },
-      { type: 'text', id: 'hero.buttonText', label: 'Button Text (leave empty to hide the button)', default: 'Shop Now' },
-      { type: 'text', id: 'hero.buttonLink', label: 'Button Link', default: '/collections/all' },
-      { type: 'text', id: 'hero.bannerLink', label: 'Banner Link (optional — makes the whole banner clickable)', default: '' },
-      { type: 'range', id: 'hero.overlayOpacity', label: 'Overlay Opacity', min: 0, max: 100, step: 5, default: 50 },
-      { type: 'color', id: 'hero.overlayColor', label: 'Overlay Color', default: '#000000' },
-      { type: 'color', id: 'hero.textColor', label: 'Text Color', default: '#ffffff' },
-      { type: 'color', id: 'hero.fallbackGradientStart', label: 'Fallback Gradient Start', show_if: 'hero.enabled' },
-      { type: 'color', id: 'hero.fallbackGradientEnd', label: 'Fallback Gradient End', show_if: 'hero.enabled' },
+
+      { type: 'header', label: 'Slides' },
+      {
+        type: 'repeater',
+        id: 'hero.slides',
+        label: 'Slides',
+        item_label: '{{heading}}',
+        add_button_label: 'Add slide',
+        max_items: 8,
+        default: [],
+        fields: [
+          {
+            type: 'image',
+            id: 'backgroundImage',
+            label: 'Image — any aspect ratio. Whatever you upload is the banner size.',
+          },
+          {
+            type: 'image',
+            id: 'mobileBackgroundImage',
+            label: 'Mobile image (optional — used on phones when set)',
+          },
+          { type: 'text', id: 'heading', label: 'Heading', default: '' },
+          { type: 'textarea', id: 'subheading', label: 'Subheading', default: '' },
+          { type: 'text', id: 'buttonText', label: 'Button text (leave empty to hide)', default: '' },
+          { type: 'text', id: 'buttonLink', label: 'Button link', default: '/collections/all' },
+          {
+            type: 'text',
+            id: 'bannerLink',
+            label: 'Banner link (optional — makes the whole slide clickable)',
+            default: '',
+          },
+          { type: 'color', id: 'textColor', label: 'Text color', default: '#ffffff' },
+          { type: 'color', id: 'overlayColor', label: 'Overlay color', default: '#000000' },
+          { type: 'range', id: 'overlayOpacity', label: 'Overlay opacity', min: 0, max: 100, step: 5, default: 40 },
+        ],
+      },
+
+      { type: 'header', label: 'Slideshow settings' },
+      { type: 'checkbox', id: 'hero.autoplay', label: 'Auto-advance slides', default: true },
+      {
+        type: 'range',
+        id: 'hero.autoplayInterval',
+        label: 'Seconds per slide',
+        min: 3,
+        max: 10,
+        step: 1,
+        default: 5,
+      },
+
+      { type: 'header', label: 'Legacy (single-banner fallback)' },
+      { type: 'paragraph', label: 'Only used when no slides are added above. New stores should use slides.' },
+      { type: 'image', id: 'hero.backgroundImage', label: 'Background image' },
+      { type: 'image', id: 'hero.mobileBackgroundImage', label: 'Mobile background image' },
+      { type: 'text', id: 'hero.heading', label: 'Heading' },
+      { type: 'textarea', id: 'hero.subheading', label: 'Subheading' },
+      { type: 'text', id: 'hero.buttonText', label: 'Button text' },
+      { type: 'text', id: 'hero.buttonLink', label: 'Button link' },
+      { type: 'text', id: 'hero.bannerLink', label: 'Banner link' },
+      { type: 'range', id: 'hero.overlayOpacity', label: 'Overlay opacity', min: 0, max: 100, step: 5, default: 50 },
+      { type: 'color', id: 'hero.overlayColor', label: 'Overlay color', default: '#000000' },
+      { type: 'color', id: 'hero.textColor', label: 'Text color', default: '#ffffff' },
+      { type: 'color', id: 'hero.fallbackGradientStart', label: 'Fallback gradient start' },
+      { type: 'color', id: 'hero.fallbackGradientEnd', label: 'Fallback gradient end' },
     ],
   },
 
