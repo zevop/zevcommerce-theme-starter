@@ -7,22 +7,20 @@ import { useParams } from 'next/navigation';
 
 // ── Layout ───────────────────────────────────────────────────────────────
 //
-// The hero container has a merchant-controlled height (separate values
-// for desktop and mobile). Images are `object-fit: contain`ed inside
-// the frame so nothing is ever cropped; any empty space around the
-// image is filled by a softly blurred copy of the image itself. This
-// way:
+// Rendering rules:
 //
-//   - Merchants size the banner to match whatever image they uploaded
-//     — no forced aspect ratio that might look wrong on their design.
-//   - The full image is always shown.
-//   - Aspect mismatches between image and chosen height produce a
-//     pleasant "frame" in the image's own colors, not stark letterbox
-//     bars.
+//   - Image slides use the IMAGE's natural aspect ratio. The frame's
+//     width is capped by `hero.maxWidth` (default 1280) and the image
+//     fills that width; its height auto-scales from intrinsic
+//     dimensions. No crop, no letterbox — merchants see exactly what
+//     they uploaded, same way the mobile layout already behaved.
 //
-// Heights come in via CSS custom properties set inline on the frame
-// so the same shared class can serve every store without re-generating
-// styles per-merchant.
+//   - Text-only slides (no image) fall back to `hero.textOnlyHeight`
+//     so an empty banner doesn't collapse to zero height.
+//
+//   - For a multi-slide carousel, each slide takes its own natural
+//     height. The container sizes to the currently-visible slide so
+//     transitions don't leave empty space.
 const heroResponsiveCSS = `
 .hero-section-wrapper {
   max-width: 1280px;
@@ -39,14 +37,6 @@ const heroResponsiveCSS = `
     padding-right: 24px;
     padding-top: 24px;
     padding-bottom: 32px;
-  }
-}
-.hero-frame {
-  height: var(--hero-h-mobile, 320px);
-}
-@media (min-width: 768px) {
-  .hero-frame {
-    height: var(--hero-h-desktop, 480px);
   }
 }
 .hero-slide {
@@ -81,6 +71,12 @@ function resolveImage(img: any): string | undefined {
   return undefined;
 }
 
+function clampNumber(raw: any, min: number, max: number, fallback: number): number {
+  const n = Number(raw);
+  if (!isFinite(n) || n <= 0) return fallback;
+  return Math.min(max, Math.max(min, Math.round(n)));
+}
+
 export default function Hero() {
   const { theme, storeConfig } = useTheme();
   const params = useParams();
@@ -93,35 +89,21 @@ export default function Hero() {
     return repeater;
   }, [hero]);
 
-  // Only bail on an EXPLICIT `enabled: false`. Treating undefined /
-  // null as "off" was wrong: merchants who configured slides but
-  // never toggled the checkbox don't always have `enabled: true`
-  // persisted, and the old check silently returned null — producing
-  // the "banner isn't rendering at all, not even the placeholder"
-  // state. Default is on, per the settings schema.
   if (hero.enabled === false) return null;
 
-  // Skip empty scaffold slides — a slide needs at least an image or
-  // some text to be worth rendering.
   const usable = slides.filter(
     (s) => resolveImage(s.backgroundImage) || s.heading || s.subheading,
   );
 
+  const maxWidth = clampNumber(hero.maxWidth, 480, 1280, 1280);
+  const textOnlyHeight = clampNumber(hero.textOnlyHeight, 200, 800, 420);
+
   if (usable.length === 0) {
-    return <PlaceholderBanner />;
+    return <PlaceholderBanner maxWidth={maxWidth} textOnlyHeight={textOnlyHeight} />;
   }
 
   const autoplay = hero.autoplay !== false && usable.length > 1;
   const autoplayMs = Math.max(3, hero.autoplayInterval ?? 5) * 1000;
-  const desktopHeight = clampHeight(hero.height, 200, 800, 480);
-  const mobileHeight = clampHeight(hero.heightMobile, 150, 600, 320);
-  // Letterbox fill behind the image. Transparent lets the page's own
-  // background show through for merchants who want the banner image
-  // to sit in the page with no frame — useful with PNGs that have
-  // their own shape or for a floating-hero look.
-  const frameBackground = hero.transparentBackground
-    ? 'transparent'
-    : (hero.backgroundColor || '#f3f4f6');
 
   return (
     <>
@@ -132,21 +114,12 @@ export default function Hero() {
           domain={domain}
           autoplay={autoplay}
           autoplayMs={autoplayMs}
-          desktopHeight={desktopHeight}
-          mobileHeight={mobileHeight}
-          frameBackground={frameBackground}
+          maxWidth={maxWidth}
+          textOnlyHeight={textOnlyHeight}
         />
       </section>
     </>
   );
-}
-
-// Defensive clamp — merchants might save out-of-range values via the
-// JSON API or a stale dashboard; we refuse to render a 5-pixel banner.
-function clampHeight(raw: any, min: number, max: number, fallback: number): number {
-  const n = Number(raw);
-  if (!isFinite(n) || n <= 0) return fallback;
-  return Math.min(max, Math.max(min, Math.round(n)));
 }
 
 // ── Slideshow ────────────────────────────────────────────────────────────
@@ -156,17 +129,15 @@ function Slideshow({
   domain,
   autoplay,
   autoplayMs,
-  desktopHeight,
-  mobileHeight,
-  frameBackground,
+  maxWidth,
+  textOnlyHeight,
 }: {
   slides: Slide[];
   domain: string;
   autoplay: boolean;
   autoplayMs: number;
-  desktopHeight: number;
-  mobileHeight: number;
-  frameBackground: string;
+  maxWidth: number;
+  textOnlyHeight: number;
 }) {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -176,10 +147,7 @@ function Slideshow({
   useEffect(() => {
     if (!autoplay || paused || count <= 1) return;
     if (typeof document !== 'undefined' && document.hidden) return;
-    timer.current = setTimeout(
-      () => setIndex((i) => (i + 1) % count),
-      autoplayMs,
-    );
+    timer.current = setTimeout(() => setIndex((i) => (i + 1) % count), autoplayMs);
     return () => clearTimeout(timer.current);
   }, [autoplay, paused, count, autoplayMs, index]);
 
@@ -192,16 +160,8 @@ function Slideshow({
 
   return (
     <div
-      className="hero-frame relative rounded-2xl overflow-hidden"
-      style={{
-        display: 'grid',
-        // CSS custom props consumed by `.hero-frame` rule in
-        // heroResponsiveCSS — the media query there picks the mobile
-        // value below 768px and the desktop value above.
-        ['--hero-h-desktop' as any]: `${desktopHeight}px`,
-        ['--hero-h-mobile' as any]: `${mobileHeight}px`,
-        backgroundColor: frameBackground,
-      }}
+      className="relative mx-auto rounded-2xl overflow-hidden"
+      style={{ maxWidth: `${maxWidth}px`, display: 'grid' }}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
@@ -211,7 +171,7 @@ function Slideshow({
           className={`hero-slide ${i === index ? 'hero-slide--active' : ''}`}
           aria-hidden={i !== index}
         >
-          <SlideView slide={slide} domain={domain} />
+          <SlideView slide={slide} domain={domain} textOnlyHeight={textOnlyHeight} />
         </div>
       ))}
 
@@ -234,9 +194,17 @@ function Slideshow({
   );
 }
 
-// ── Slide view ───────────────────────────────────────────────────────────
+// ── Single slide ─────────────────────────────────────────────────────────
 
-function SlideView({ slide, domain }: { slide: Slide; domain: string }) {
+function SlideView({
+  slide,
+  domain,
+  textOnlyHeight,
+}: {
+  slide: Slide;
+  domain: string;
+  textOnlyHeight: number;
+}) {
   const bg = resolveImage(slide.backgroundImage);
   const mobileBg = resolveImage(slide.mobileBackgroundImage);
   const heading = slide.heading || '';
@@ -253,8 +221,6 @@ function SlideView({ slide, domain }: { slide: Slide; domain: string }) {
     const classes =
       'inline-flex items-center justify-center px-8 py-4 min-h-[3.5rem] text-base font-semibold rounded-lg transition-opacity hover:opacity-90';
     const style = { backgroundColor: '#ffffff', color: '#111827' };
-    // If the whole banner is a link, render the button as a visual
-    // span — nested <a> elements are invalid HTML.
     if (bannerLink) {
       return (
         <span className={classes} style={style}>
@@ -272,25 +238,30 @@ function SlideView({ slide, domain }: { slide: Slide; domain: string }) {
   const content = (
     <>
       {bg ? (
-        // Image is `object-contain`ed inside the frame so nothing is
-        // cropped. Any empty space around the image shows the frame's
-        // solid background color — the merchant can tune the banner
-        // height slider until the image fills the frame cleanly.
-        <picture className="absolute inset-0 flex items-center justify-center">
+        // Natural-aspect image: browser renders at the image's intrinsic
+        // dimensions scaled to fit the frame's width. No crop, no
+        // letterbox — the slide is exactly the aspect of the uploaded
+        // image. Same behavior on mobile, where this "just works"
+        // already because the container width is narrow and the image
+        // shrinks to fit.
+        <picture className="block">
           {mobileBg && <source media="(max-width: 767px)" srcSet={mobileBg} />}
           <img
             src={bg}
             alt=""
-            className="w-full h-full object-contain"
+            className="block w-full h-auto"
             loading="eager"
           />
         </picture>
       ) : (
-        // Text-only slide: fall back to the theme's primary color so
-        // the slide still looks like a deliberate banner.
+        // Text-only slide: fixed height so it reads as a banner rather
+        // than a text block. Uses the theme's primary color as a
+        // deliberate full-bleed background.
         <div
-          className="absolute inset-0"
-          style={{ backgroundColor: 'var(--color-primary, #2563EB)' }}
+          style={{
+            height: `${textOnlyHeight}px`,
+            backgroundColor: 'var(--color-primary, #2563EB)',
+          }}
         />
       )}
 
@@ -327,26 +298,36 @@ function SlideView({ slide, domain }: { slide: Slide; domain: string }) {
     return (
       <Link
         href={getStorePermalink(domain, bannerLink)}
-        className="block relative w-full h-full cursor-pointer no-underline"
+        className="block relative w-full cursor-pointer no-underline"
       >
         {content}
       </Link>
     );
   }
 
-  return <div className="relative w-full h-full">{content}</div>;
+  return <div className="relative w-full">{content}</div>;
 }
 
 // ── Placeholder ──────────────────────────────────────────────────────────
 
-function PlaceholderBanner() {
+function PlaceholderBanner({
+  maxWidth,
+  textOnlyHeight,
+}: {
+  maxWidth: number;
+  textOnlyHeight: number;
+}) {
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: heroResponsiveCSS }} />
       <section className="hero-section-wrapper">
         <div
-          className="hero-frame rounded-2xl flex flex-col items-center justify-center text-center"
-          style={{ backgroundColor: '#f5f5f5' }}
+          className="rounded-2xl flex flex-col items-center justify-center text-center mx-auto"
+          style={{
+            backgroundColor: '#f5f5f5',
+            height: `${textOnlyHeight}px`,
+            maxWidth: `${maxWidth}px`,
+          }}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

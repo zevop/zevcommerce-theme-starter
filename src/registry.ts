@@ -20,6 +20,8 @@ import CheckoutSection from './sections/CheckoutSection';
 import { schema as CheckoutSectionSchema } from './sections/CheckoutSection';
 import ThankYouSection from './sections/ThankYouSection';
 import { schema as ThankYouSectionSchema } from './sections/ThankYouSection';
+import CustomerAuth from './sections/CustomerAuth';
+import { schema as CustomerAuthSchema } from './sections/CustomerAuth';
 
 export const starterSectionRegistry: Record<string, { component: any; schema: any }> = {
   'header': { component: Header as any, schema: HeaderSchema },
@@ -33,6 +35,7 @@ export const starterSectionRegistry: Record<string, { component: any; schema: an
   'cart-page': { component: CartSection as any, schema: CartSectionSchema },
   'checkout-page': { component: CheckoutSection as any, schema: CheckoutSectionSchema },
   'thank-you': { component: ThankYouSection as any, schema: ThankYouSectionSchema },
+  'customer-auth': { component: CustomerAuth as any, schema: CustomerAuthSchema },
 };
 
 export const starterBlockRegistry: Record<string, { component: any; schema: any }> = {};

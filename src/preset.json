@@ -21,10 +21,8 @@
       "enabled": true,
       "autoplay": true,
       "autoplayInterval": 5,
-      "height": 480,
-      "heightMobile": 320,
-      "transparentBackground": false,
-      "backgroundColor": "#f3f4f6",
+      "maxWidth": 1280,
+      "textOnlyHeight": 420,
       "slides": [
         {
           "backgroundImage": null,
@@ -121,6 +119,22 @@
     "main-thank-you": {
       "type": "thank-you",
       "settings": {}
+    },
+    "main-login": {
+      "type": "customer-auth",
+      "settings": { "mode": "login" }
+    },
+    "main-register": {
+      "type": "customer-auth",
+      "settings": { "mode": "register" }
+    },
+    "main-forgot-password": {
+      "type": "customer-auth",
+      "settings": { "mode": "forgot-password" }
+    },
+    "main-account": {
+      "type": "customer-auth",
+      "settings": { "mode": "account" }
     }
   },
   "layout": {
@@ -142,6 +156,10 @@
     "collection": { "order": ["main-collection"] },
     "cart": { "order": ["main-cart"] },
     "checkout": { "order": ["main-checkout"] },
-    "thank_you": { "order": ["main-thank-you"] }
+    "thank_you": { "order": ["main-thank-you"] },
+    "login": { "order": ["main-login"] },
+    "register": { "order": ["main-register"] },
+    "forgot_password": { "order": ["main-forgot-password"] },
+    "account": { "order": ["main-account"] }
   }
 }

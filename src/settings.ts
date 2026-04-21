@@ -98,38 +98,27 @@ export const settingsSchema = defineSettings([
 
       { type: 'header', label: 'Banner size' },
       {
+        type: 'paragraph',
+        label:
+          'The image loads at its natural aspect — your full banner shows with no cropping. Use the max width below if you want a narrower banner; height is set automatically from the image.',
+      },
+      {
         type: 'range',
-        id: 'hero.height',
-        label: 'Desktop height (px)',
+        id: 'hero.maxWidth',
+        label: 'Max width on desktop (px)',
+        min: 480,
+        max: 1280,
+        step: 20,
+        default: 1280,
+      },
+      {
+        type: 'range',
+        id: 'hero.textOnlyHeight',
+        label: 'Height for slides without an image (px)',
         min: 200,
         max: 800,
-        step: 10,
-        default: 480,
-      },
-      {
-        type: 'range',
-        id: 'hero.heightMobile',
-        label: 'Mobile height (px)',
-        min: 150,
-        max: 600,
-        step: 10,
-        default: 320,
-      },
-
-      { type: 'header', label: 'Banner background' },
-      {
-        type: 'checkbox',
-        id: 'hero.transparentBackground',
-        label: 'Transparent background (show page behind the image)',
-        default: false,
-      },
-      {
-        type: 'color',
-        id: 'hero.backgroundColor',
-        label: 'Background color (fills empty space around the image)',
-        default: '#f3f4f6',
-        // Hidden when transparent is on — the value is irrelevant then.
-        show_if: { id: 'hero.transparentBackground', value: false },
+        step: 20,
+        default: 420,
       },
 
       { type: 'header', label: 'Slideshow settings' },
