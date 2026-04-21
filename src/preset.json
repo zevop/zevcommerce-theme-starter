@@ -19,16 +19,22 @@
     },
     "hero": {
       "enabled": true,
-      "backgroundImage": null,
-      "heading": "Welcome to our store",
-      "subheading": "Discover amazing products at great prices.",
-      "buttonText": "Shop Now",
-      "buttonLink": "/collections/all",
-      "overlayOpacity": 50,
-      "overlayColor": "#000000",
-      "textColor": "#ffffff",
-      "fallbackGradientStart": null,
-      "fallbackGradientEnd": null
+      "autoplay": true,
+      "autoplayInterval": 5,
+      "slides": [
+        {
+          "backgroundImage": null,
+          "mobileBackgroundImage": null,
+          "heading": "Welcome to our store",
+          "subheading": "Discover amazing products at great prices.",
+          "buttonText": "Shop Now",
+          "buttonLink": "/collections/all",
+          "bannerLink": "",
+          "textColor": "#ffffff",
+          "overlayColor": "#000000",
+          "overlayOpacity": 40
+        }
+      ]
     },
     "products": {
       "enabled": true,

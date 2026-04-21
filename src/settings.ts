@@ -49,11 +49,11 @@ export const settingsSchema = defineSettings([
   // ============================================================
   // HERO BANNER
   // ============================================================
-  // Single-banner settings are kept for backward compatibility with
-  // stores created before multi-slide support — Hero.tsx falls back
-  // to these if `hero.slides` is empty. New stores should use the
-  // slides repeater below. The legacy fields render at the TOP so
-  // existing merchants see their familiar controls first.
+  // Slides are the single source of truth — each slide is self-
+  // contained with its own image, copy, CTA, and optional whole-slide
+  // link. The container on the storefront has a fixed aspect ratio and
+  // images are `object-fit: contain`ed inside it, so merchants can
+  // upload any rectangular image without worrying about cropping.
   {
     name: 'Hero Banner',
     icon: 'image',
@@ -73,7 +73,7 @@ export const settingsSchema = defineSettings([
           {
             type: 'image',
             id: 'backgroundImage',
-            label: 'Image — any aspect ratio. Whatever you upload is the banner size.',
+            label: 'Image — any rectangular image works; nothing gets cropped.',
           },
           {
             type: 'image',
@@ -107,21 +107,6 @@ export const settingsSchema = defineSettings([
         step: 1,
         default: 5,
       },
-
-      { type: 'header', label: 'Legacy (single-banner fallback)' },
-      { type: 'paragraph', label: 'Only used when no slides are added above. New stores should use slides.' },
-      { type: 'image', id: 'hero.backgroundImage', label: 'Background image' },
-      { type: 'image', id: 'hero.mobileBackgroundImage', label: 'Mobile background image' },
-      { type: 'text', id: 'hero.heading', label: 'Heading' },
-      { type: 'textarea', id: 'hero.subheading', label: 'Subheading' },
-      { type: 'text', id: 'hero.buttonText', label: 'Button text' },
-      { type: 'text', id: 'hero.buttonLink', label: 'Button link' },
-      { type: 'text', id: 'hero.bannerLink', label: 'Banner link' },
-      { type: 'range', id: 'hero.overlayOpacity', label: 'Overlay opacity', min: 0, max: 100, step: 5, default: 50 },
-      { type: 'color', id: 'hero.overlayColor', label: 'Overlay color', default: '#000000' },
-      { type: 'color', id: 'hero.textColor', label: 'Text color', default: '#ffffff' },
-      { type: 'color', id: 'hero.fallbackGradientStart', label: 'Fallback gradient start' },
-      { type: 'color', id: 'hero.fallbackGradientEnd', label: 'Fallback gradient end' },
     ],
   },
 

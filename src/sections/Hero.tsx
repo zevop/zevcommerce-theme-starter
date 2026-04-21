@@ -5,8 +5,23 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTheme, getStorePermalink } from '@zevcommerce/storefront-api';
 import { useParams } from 'next/navigation';
 
-// Scoped responsive styles. Image swapping is native via `<picture>`
-// inside each slide so we don't need a CSS-variable trick any more.
+// ── Layout constants ─────────────────────────────────────────────────────
+//
+// The hero container uses a FIXED aspect ratio per breakpoint so the
+// banner always looks like a banner — regardless of what the merchant
+// uploads. The image itself is rendered with `object-fit: contain` so
+// it is NEVER cropped; letterboxed areas are filled by a softly
+// blurred, zoomed copy of the same image. This way:
+//
+//   - Non-designer merchants can upload any rectangular image and the
+//     banner always has a respectable size + looks deliberate.
+//   - Nothing important gets sliced off — the full image is always shown.
+//   - Aspect mismatches produce a pleasant "frame" of the image's own
+//     colors instead of stark letterbox bars.
+//
+// Aspect ratios chosen after looking at typical landing-page heroes:
+//   - Mobile (<md): 5:4 (gentle landscape, portrait-ish — content reads)
+//   - Desktop (≥md): 12:5 / 2.4:1 (cinematic — wide without being thin)
 const heroResponsiveCSS = `
 .hero-section-wrapper {
   max-width: 1280px;
@@ -24,9 +39,6 @@ const heroResponsiveCSS = `
     padding-top: 24px;
     padding-bottom: 32px;
   }
-}
-.hero-slides {
-  position: relative;
 }
 .hero-slide {
   grid-area: 1 / 1;
@@ -60,12 +72,6 @@ function resolveImage(img: any): string | undefined {
   return undefined;
 }
 
-// Preset text that ships in preset.json — used ONLY as a sentinel to
-// detect "merchant hasn't touched the hero yet" vs "merchant cleared
-// it deliberately". Never rendered directly.
-const PRESET_HEADING = 'Welcome to our store';
-const PRESET_SUBHEADING = 'Discover amazing products at great prices.';
-
 export default function Hero() {
   const { theme, storeConfig } = useTheme();
   const params = useParams();
@@ -73,62 +79,22 @@ export default function Hero() {
 
   const hero = theme?.settings?.hero;
 
-  // Normalize the incoming config. Prefer the multi-slide repeater
-  // (`hero.slides`) — fall back to the legacy single-banner keys
-  // (`hero.heading`, `hero.backgroundImage`, etc.) so stores created
-  // before multi-slide support keep rendering. Computed before the
-  // `enabled` guard so we can also use it in that check.
   const slides = useMemo<Slide[]>(() => {
     if (!hero) return [];
     const repeater: Slide[] = Array.isArray(hero.slides) ? hero.slides : [];
-    if (repeater.length > 0) return repeater;
-
-    const hasLegacy =
-      resolveImage(hero.backgroundImage) ||
-      (hero.heading && hero.heading !== PRESET_HEADING) ||
-      (hero.subheading && hero.subheading !== PRESET_SUBHEADING);
-    if (!hasLegacy) return [];
-
-    return [
-      {
-        backgroundImage: hero.backgroundImage,
-        mobileBackgroundImage: hero.mobileBackgroundImage,
-        heading: hero.heading,
-        subheading: hero.subheading,
-        buttonText: hero.buttonText,
-        buttonLink: hero.buttonLink,
-        bannerLink: hero.bannerLink,
-        textColor: hero.textColor,
-        overlayColor: hero.overlayColor,
-        overlayOpacity: hero.overlayOpacity,
-      },
-    ];
+    return repeater;
   }, [hero]);
 
   if (!hero?.enabled) return null;
 
-  // Filter to "usable" slides — a slide needs at least an image or
-  // some text to be worth rendering. Empty scaffold slides (merchant
-  // clicked "Add slide" but didn't fill anything) are silently skipped.
+  // Skip empty scaffold slides — a slide needs at least an image or
+  // some text to be worth rendering.
   const usable = slides.filter(
     (s) => resolveImage(s.backgroundImage) || s.heading || s.subheading,
   );
 
-  const hasCustomGradient =
-    !!hero.fallbackGradientStart && !!hero.fallbackGradientEnd;
-
-  // Placeholder: shown when merchant hasn't customized yet. Compared
-  // against the preset sentinels so a first-time store (heading still
-  // equal to the preset text, no bg image) shows the placeholder, but
-  // a deliberately-cleared heading with any other signal does NOT.
-  if (usable.length === 0 && !hasCustomGradient) {
+  if (usable.length === 0) {
     return <PlaceholderBanner />;
-  }
-
-  // No slides but merchant set a fallback gradient — render a single
-  // text-only banner using the legacy global text / button fields.
-  if (usable.length === 0 && hasCustomGradient) {
-    return <GradientBanner hero={hero} domain={domain} />;
   }
 
   const autoplay = hero.autoplay !== false && usable.length > 1;
@@ -167,9 +133,6 @@ function Slideshow({
   const timer = useRef<any>(null);
   const count = slides.length;
 
-  // Autoplay loop. Pauses when the user hovers or when the tab is
-  // hidden — no point burning cycles rotating a banner nobody's
-  // looking at.
   useEffect(() => {
     if (!autoplay || paused || count <= 1) return;
     if (typeof document !== 'undefined' && document.hidden) return;
@@ -187,13 +150,9 @@ function Slideshow({
     return () => document.removeEventListener('visibilitychange', onVisibility);
   }, []);
 
-  // CSS grid stack + opacity fade = simpler than true carousel
-  // translation and preserves each slide's own aspect ratio. The
-  // container inherits its height from the currently-active slide's
-  // image so the banner is exactly as tall as the image itself.
   return (
     <div
-      className="hero-slides relative rounded-2xl overflow-hidden"
+      className="relative rounded-2xl overflow-hidden aspect-[5/4] md:aspect-[12/5] bg-gray-100"
       style={{ display: 'grid' }}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
@@ -227,7 +186,7 @@ function Slideshow({
   );
 }
 
-// ── Single slide ─────────────────────────────────────────────────────────
+// ── Slide view ───────────────────────────────────────────────────────────
 
 function SlideView({ slide, domain }: { slide: Slide; domain: string }) {
   const bg = resolveImage(slide.backgroundImage);
@@ -246,8 +205,8 @@ function SlideView({ slide, domain }: { slide: Slide; domain: string }) {
     const classes =
       'inline-flex items-center justify-center px-8 py-4 min-h-[3.5rem] text-base font-semibold rounded-lg transition-opacity hover:opacity-90';
     const style = { backgroundColor: '#ffffff', color: '#111827' };
-    // When the whole banner is a link, render the button as a visual
-    // span to avoid nested <a> which is invalid HTML.
+    // If the whole banner is a link, render the button as a visual
+    // span — nested <a> elements are invalid HTML.
     if (bannerLink) {
       return (
         <span className={classes} style={style}>
@@ -265,15 +224,37 @@ function SlideView({ slide, domain }: { slide: Slide; domain: string }) {
   const content = (
     <>
       {bg ? (
-        <picture className="block">
-          {mobileBg && <source media="(max-width: 767px)" srcSet={mobileBg} />}
-          {/* alt="" — hero image is decorative; heading/subheading carry meaning. */}
-          <img src={bg} alt="" className="block w-full h-auto" loading="eager" />
-        </picture>
+        <>
+          {/* Blurred, zoomed fill. Sits behind the contained image and
+              softens any letterboxing into a natural-looking frame in
+              the image's own colors. `alt=""` because this copy is
+              purely decorative — the real image below carries meaning. */}
+          <picture className="absolute inset-0 block">
+            {mobileBg && <source media="(max-width: 767px)" srcSet={mobileBg} />}
+            <img
+              src={bg}
+              alt=""
+              aria-hidden="true"
+              className="w-full h-full object-cover scale-110 blur-2xl opacity-70"
+            />
+          </picture>
+
+          {/* The actual image — contained so nothing is cropped. */}
+          <picture className="absolute inset-0 flex items-center justify-center">
+            {mobileBg && <source media="(max-width: 767px)" srcSet={mobileBg} />}
+            <img
+              src={bg}
+              alt=""
+              className="w-full h-full object-contain"
+              loading="eager"
+            />
+          </picture>
+        </>
       ) : (
-        // Text-only slide. Use a neutral colored block sized by content.
+        // Text-only slide: fall back to the theme's primary color so
+        // the slide still looks like a deliberate banner.
         <div
-          className="w-full py-16 md:py-24"
+          className="absolute inset-0"
           style={{ backgroundColor: 'var(--color-primary, #2563EB)' }}
         />
       )}
@@ -311,17 +292,17 @@ function SlideView({ slide, domain }: { slide: Slide; domain: string }) {
     return (
       <Link
         href={getStorePermalink(domain, bannerLink)}
-        className="block relative cursor-pointer no-underline"
+        className="block relative w-full h-full cursor-pointer no-underline"
       >
         {content}
       </Link>
     );
   }
 
-  return <div className="block relative">{content}</div>;
+  return <div className="relative w-full h-full">{content}</div>;
 }
 
-// ── Placeholder + legacy gradient banner ─────────────────────────────────
+// ── Placeholder ──────────────────────────────────────────────────────────
 
 function PlaceholderBanner() {
   return (
@@ -329,16 +310,8 @@ function PlaceholderBanner() {
       <style dangerouslySetInnerHTML={{ __html: heroResponsiveCSS }} />
       <section className="hero-section-wrapper">
         <div
-          style={{
-            backgroundColor: '#f5f5f5',
-            borderRadius: '16px',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            textAlign: 'center',
-            padding: '56px 24px',
-          }}
+          className="rounded-2xl aspect-[5/4] md:aspect-[12/5] flex flex-col items-center justify-center text-center"
+          style={{ backgroundColor: '#f5f5f5' }}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -356,82 +329,9 @@ function PlaceholderBanner() {
             <polyline points="21 15 16 10 5 21" />
           </svg>
           <p style={{ color: '#b0b0b0', fontSize: '14px', marginTop: '12px' }}>
-            Add a hero slide or customize your banner
+            Add a hero slide to customize your banner
           </p>
         </div>
-      </section>
-    </>
-  );
-}
-
-function GradientBanner({ hero, domain }: { hero: any; domain: string }) {
-  const heading = hero.heading || '';
-  const subheading = hero.subheading || '';
-  const buttonText = hero.buttonText || '';
-  const buttonLink = hero.buttonLink || '/collections/all';
-  const bannerLink = hero.bannerLink || '';
-  const textColor = hero.textColor || '#ffffff';
-  const bgStyle: React.CSSProperties = {
-    background: `linear-gradient(135deg, ${hero.fallbackGradientStart}, ${hero.fallbackGradientEnd})`,
-  };
-
-  const renderButton = () => {
-    if (!buttonText) return null;
-    const classes =
-      'inline-flex items-center justify-center px-8 py-4 min-h-[3.5rem] text-base font-semibold rounded-lg transition-opacity hover:opacity-90';
-    const style = { backgroundColor: '#ffffff', color: 'var(--color-primary)' };
-    if (bannerLink) {
-      return (
-        <span className={classes} style={style}>
-          {buttonText}
-        </span>
-      );
-    }
-    return (
-      <Link href={getStorePermalink(domain, buttonLink)} className={classes} style={style}>
-        {buttonText}
-      </Link>
-    );
-  };
-
-  const body = (
-    <div className="rounded-2xl py-16 md:py-24" style={bgStyle}>
-      <div className="px-5 text-center">
-        {heading && (
-          <h1
-            className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 leading-tight"
-            style={{ color: textColor }}
-          >
-            {heading}
-          </h1>
-        )}
-        {subheading && (
-          <p
-            className="text-base sm:text-lg max-w-xl mx-auto mb-8 opacity-80"
-            style={{ color: textColor }}
-          >
-            {subheading}
-          </p>
-        )}
-        {renderButton()}
-      </div>
-    </div>
-  );
-
-  return (
-    <>
-      <style dangerouslySetInnerHTML={{ __html: heroResponsiveCSS }} />
-      <section className="hero-section-wrapper">
-        {bannerLink ? (
-          <Link
-            href={getStorePermalink(domain, bannerLink)}
-            className="block cursor-pointer no-underline"
-          >
-            {body}
-          </Link>
-        ) : (
-          body
-        )}
       </section>
     </>
   );
