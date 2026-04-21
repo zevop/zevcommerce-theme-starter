@@ -96,6 +96,26 @@ export const settingsSchema = defineSettings([
         ],
       },
 
+      { type: 'header', label: 'Banner size' },
+      {
+        type: 'range',
+        id: 'hero.height',
+        label: 'Desktop height (px)',
+        min: 200,
+        max: 800,
+        step: 10,
+        default: 480,
+      },
+      {
+        type: 'range',
+        id: 'hero.heightMobile',
+        label: 'Mobile height (px)',
+        min: 150,
+        max: 600,
+        step: 10,
+        default: 320,
+      },
+
       { type: 'header', label: 'Slideshow settings' },
       { type: 'checkbox', id: 'hero.autoplay', label: 'Auto-advance slides', default: true },
       {

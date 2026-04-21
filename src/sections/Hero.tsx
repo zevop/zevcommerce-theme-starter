@@ -5,23 +5,24 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTheme, getStorePermalink } from '@zevcommerce/storefront-api';
 import { useParams } from 'next/navigation';
 
-// ── Layout constants ─────────────────────────────────────────────────────
+// ── Layout ───────────────────────────────────────────────────────────────
 //
-// The hero container uses a FIXED aspect ratio per breakpoint so the
-// banner always looks like a banner — regardless of what the merchant
-// uploads. The image itself is rendered with `object-fit: contain` so
-// it is NEVER cropped; letterboxed areas are filled by a softly
-// blurred, zoomed copy of the same image. This way:
+// The hero container has a merchant-controlled height (separate values
+// for desktop and mobile). Images are `object-fit: contain`ed inside
+// the frame so nothing is ever cropped; any empty space around the
+// image is filled by a softly blurred copy of the image itself. This
+// way:
 //
-//   - Non-designer merchants can upload any rectangular image and the
-//     banner always has a respectable size + looks deliberate.
-//   - Nothing important gets sliced off — the full image is always shown.
-//   - Aspect mismatches produce a pleasant "frame" of the image's own
-//     colors instead of stark letterbox bars.
+//   - Merchants size the banner to match whatever image they uploaded
+//     — no forced aspect ratio that might look wrong on their design.
+//   - The full image is always shown.
+//   - Aspect mismatches between image and chosen height produce a
+//     pleasant "frame" in the image's own colors, not stark letterbox
+//     bars.
 //
-// Aspect ratios chosen after looking at typical landing-page heroes:
-//   - Mobile (<md): 5:4 (gentle landscape, portrait-ish — content reads)
-//   - Desktop (≥md): 12:5 / 2.4:1 (cinematic — wide without being thin)
+// Heights come in via CSS custom properties set inline on the frame
+// so the same shared class can serve every store without re-generating
+// styles per-merchant.
 const heroResponsiveCSS = `
 .hero-section-wrapper {
   max-width: 1280px;
@@ -38,6 +39,14 @@ const heroResponsiveCSS = `
     padding-right: 24px;
     padding-top: 24px;
     padding-bottom: 32px;
+  }
+}
+.hero-frame {
+  height: var(--hero-h-mobile, 320px);
+}
+@media (min-width: 768px) {
+  .hero-frame {
+    height: var(--hero-h-desktop, 480px);
   }
 }
 .hero-slide {
@@ -77,15 +86,20 @@ export default function Hero() {
   const params = useParams();
   const domain = (params?.domain as string) || storeConfig?.handle || '';
 
-  const hero = theme?.settings?.hero;
+  const hero = theme?.settings?.hero ?? {};
 
   const slides = useMemo<Slide[]>(() => {
-    if (!hero) return [];
     const repeater: Slide[] = Array.isArray(hero.slides) ? hero.slides : [];
     return repeater;
   }, [hero]);
 
-  if (!hero?.enabled) return null;
+  // Only bail on an EXPLICIT `enabled: false`. Treating undefined /
+  // null as "off" was wrong: merchants who configured slides but
+  // never toggled the checkbox don't always have `enabled: true`
+  // persisted, and the old check silently returned null — producing
+  // the "banner isn't rendering at all, not even the placeholder"
+  // state. Default is on, per the settings schema.
+  if (hero.enabled === false) return null;
 
   // Skip empty scaffold slides — a slide needs at least an image or
   // some text to be worth rendering.
@@ -99,6 +113,8 @@ export default function Hero() {
 
   const autoplay = hero.autoplay !== false && usable.length > 1;
   const autoplayMs = Math.max(3, hero.autoplayInterval ?? 5) * 1000;
+  const desktopHeight = clampHeight(hero.height, 200, 800, 480);
+  const mobileHeight = clampHeight(hero.heightMobile, 150, 600, 320);
 
   return (
     <>
@@ -109,10 +125,20 @@ export default function Hero() {
           domain={domain}
           autoplay={autoplay}
           autoplayMs={autoplayMs}
+          desktopHeight={desktopHeight}
+          mobileHeight={mobileHeight}
         />
       </section>
     </>
   );
+}
+
+// Defensive clamp — merchants might save out-of-range values via the
+// JSON API or a stale dashboard; we refuse to render a 5-pixel banner.
+function clampHeight(raw: any, min: number, max: number, fallback: number): number {
+  const n = Number(raw);
+  if (!isFinite(n) || n <= 0) return fallback;
+  return Math.min(max, Math.max(min, Math.round(n)));
 }
 
 // ── Slideshow ────────────────────────────────────────────────────────────
@@ -122,11 +148,15 @@ function Slideshow({
   domain,
   autoplay,
   autoplayMs,
+  desktopHeight,
+  mobileHeight,
 }: {
   slides: Slide[];
   domain: string;
   autoplay: boolean;
   autoplayMs: number;
+  desktopHeight: number;
+  mobileHeight: number;
 }) {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -152,8 +182,15 @@ function Slideshow({
 
   return (
     <div
-      className="relative rounded-2xl overflow-hidden aspect-[5/4] md:aspect-[12/5] bg-gray-100"
-      style={{ display: 'grid' }}
+      className="hero-frame relative rounded-2xl overflow-hidden bg-gray-100"
+      style={{
+        display: 'grid',
+        // CSS custom props consumed by `.hero-frame` rule in
+        // heroResponsiveCSS — the media query there picks the mobile
+        // value below 768px and the desktop value above.
+        ['--hero-h-desktop' as any]: `${desktopHeight}px`,
+        ['--hero-h-mobile' as any]: `${mobileHeight}px`,
+      }}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
@@ -310,7 +347,7 @@ function PlaceholderBanner() {
       <style dangerouslySetInnerHTML={{ __html: heroResponsiveCSS }} />
       <section className="hero-section-wrapper">
         <div
-          className="rounded-2xl aspect-[5/4] md:aspect-[12/5] flex flex-col items-center justify-center text-center"
+          className="hero-frame rounded-2xl flex flex-col items-center justify-center text-center"
           style={{ backgroundColor: '#f5f5f5' }}
         >
           <svg

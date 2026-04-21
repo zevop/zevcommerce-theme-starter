@@ -21,6 +21,8 @@
       "enabled": true,
       "autoplay": true,
       "autoplayInterval": 5,
+      "height": 480,
+      "heightMobile": 320,
       "slides": [
         {
           "backgroundImage": null,
