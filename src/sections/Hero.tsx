@@ -177,7 +177,14 @@ export default function Hero() {
         <section className="hero-section-wrapper">
           {wrapBanner(
             <div
-              className="hero-bg-image relative flex items-center justify-center min-h-[50vh] md:min-h-[65vh] rounded-2xl overflow-hidden"
+              // Aspect-ratio-based sizing, NOT viewport-based. The
+              // container's aspect exactly matches the recommended
+              // image aspect at each breakpoint, so `background-size:
+              // cover` never actually has anything to crop — the image
+              // always fits perfectly. Mobile (<md) uses 9:10 portrait
+              // to match 1080×1200 uploads; md+ uses ~24:13 landscape
+              // to match 2400×1300 uploads.
+              className="hero-bg-image relative flex items-center justify-center aspect-[9/10] md:aspect-[24/13] rounded-2xl overflow-hidden"
               style={{
                 // CSS custom props feed both images in — the shared
                 // @media rule swaps to the mobile image below 768px

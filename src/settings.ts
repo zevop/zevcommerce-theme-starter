@@ -54,8 +54,8 @@ export const settingsSchema = defineSettings([
     icon: 'image',
     settings: [
       { type: 'checkbox', id: 'hero.enabled', label: 'Show Hero', default: true },
-      { type: 'image', id: 'hero.backgroundImage', label: 'Background Image (recommended 2400×1000 landscape)' },
-      { type: 'image', id: 'hero.mobileBackgroundImage', label: 'Mobile Background Image (optional — recommended 800×1000 portrait)' },
+      { type: 'image', id: 'hero.backgroundImage', label: 'Background Image (recommended 2400×1300 landscape — keep key text/logo near the center)' },
+      { type: 'image', id: 'hero.mobileBackgroundImage', label: 'Mobile Background Image (optional — recommended 1080×1200 portrait — keep key text/logo near the center)' },
       { type: 'text', id: 'hero.heading', label: 'Heading', default: 'Welcome to our store' },
       { type: 'textarea', id: 'hero.subheading', label: 'Subheading', default: 'Discover amazing products at great prices.' },
       { type: 'text', id: 'hero.buttonText', label: 'Button Text (leave empty to hide the button)', default: 'Shop Now' },
